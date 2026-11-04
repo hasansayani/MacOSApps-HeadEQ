@@ -2,7 +2,7 @@ import EQCore
 import SwiftUI
 
 enum Page: String, CaseIterable, Identifiable {
-    case equalizer, output, spatial, system, hearing, background, expert, features
+    case equalizer, output, spatial, loudness, system, hearing, background, expert, features
     var id: String { rawValue }
 
     /// Sidebar grouping.
@@ -10,7 +10,7 @@ enum Page: String, CaseIterable, Identifiable {
 
     var group: Group {
         switch self {
-        case .equalizer, .output, .spatial: return .sound
+        case .equalizer, .output, .spatial, .loudness: return .sound
         case .hearing, .background: return .hearing
         case .expert: return .tools
         case .system, .features: return .app
@@ -21,6 +21,7 @@ enum Page: String, CaseIterable, Identifiable {
     var featureID: String? {
         switch self {
         case .spatial: return "surround"
+        case .loudness: return "leveler"
         default: return nil
         }
     }
@@ -30,6 +31,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .equalizer: return "Equalizer"
         case .output: return "Output"
         case .spatial: return "Spatial"
+        case .loudness: return "Loudness"
         case .system: return "System Audio"
         case .hearing: return "Hearing Protection"
         case .background: return "Background Sounds"
@@ -43,6 +45,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .equalizer: return "slider.vertical.3"
         case .output: return "dial.medium"
         case .spatial: return "person.wave.2"
+        case .loudness: return "speaker.wave.2.bubble"
         case .system: return "speaker.wave.2"
         case .hearing: return "ear"
         case .background: return "cloud.rain"
@@ -56,6 +59,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .equalizer: return "Headphones, presets and the graphic EQ"
         case .output: return "Gain, stereo, crossfeed, limiter and device"
         case .spatial: return "Virtual speakers for headphones"
+        case .loudness: return "Volume levelling across tracks, apps and videos"
         case .system: return "Device volume, alerts, Headphone Accommodations and Transparency"
         case .hearing: return "Spike guard, level cap and today's sound dose"
         case .background: return "macOS Accessibility Background Sounds"
@@ -131,6 +135,7 @@ struct ContentView: View {
         case .equalizer: EqualizerPage()
         case .output: OutputCard()
         case .spatial: SpatialPage()
+        case .loudness: LoudnessPage()
         case .system: SystemAudioPage()
         case .hearing: HearingProtectionCard()
         case .background: BackgroundSoundsCard()

@@ -24,6 +24,8 @@ final class TapBackend: AudioBackend {
     var limiterReductionDB: Float { renderer.processor.limiterReductionDB }
     var protectionReductionDB: Float { renderer.processor.protectionReductionDB }
     var outputLevelDBFS: Float { renderer.processor.outputLevelDBFS }
+    var levelerGainDB: Float { renderer.processor.levelerGainDB }
+    var loudnessLUFS: Float { renderer.processor.loudnessLUFS }
     private var lastHearing = RealtimeHearing()
     private var lastProcessing = ProcessingConfig()
     private var installedSignature = StageSignature()
@@ -33,7 +35,7 @@ final class TapBackend: AudioBackend {
         // Build stage objects only when the set of enabled features changes.
         if processing.signature != installedSignature || !renderer.hasStageSet(for: processing.signature) {
             installedSignature = processing.signature
-            renderer.post(stages: processing.signature.isEmpty ? nil : StageSet(surround: processing.signature.surround))
+            renderer.post(stages: processing.signature.isEmpty ? nil : StageSet(processing.signature))
         }
         renderer.post(stageParams: processing.realtime(sampleRate: sampleRate))
     }

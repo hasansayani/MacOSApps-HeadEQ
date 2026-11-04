@@ -8,6 +8,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
     /// Remember settings per output device and restore them on reconnect.
     public var deviceMemory = false
     public var surround = SurroundSettings()
+    public var leveler = LevelerSettings()
 
     public init() {}
 
@@ -17,6 +18,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         measuredProfiles = c.value(.measuredProfiles, d.measuredProfiles)
         deviceMemory = c.value(.deviceMemory, d.deviceMemory)
         surround = c.value(.surround, d.surround)
+        leveler = c.value(.leveler, d.leveler)
     }
 
     /// Catalogue of optional features, in display order.
@@ -30,11 +32,14 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         FeatureInfo(id: "surround", title: "Virtual surround",
                     summary: "Hear headphones like a pair of speakers in front of you: natural crossfeed with head-shadow timing plus early room reflections.",
                     cost: "≈ 70 KB buffers · light per-sample work", icon: "person.wave.2"),
+        FeatureInfo(id: "leveler", title: "Volume levelling",
+                    summary: "Evens out loudness between songs, apps and videos with a slow, transparent gain ride measured in LUFS (ITU BS.1770).",
+                    cost: "< 1 KB · 4 filters per sample", icon: "speaker.wave.2.bubble"),
     ]
 
     /// Processing stages to run for these settings.
     public var processing: ProcessingConfig {
-        ProcessingConfig(surround: surround.enabled ? surround : nil)
+        ProcessingConfig(surround: surround.enabled ? surround : nil, leveler: leveler.enabled ? leveler : nil)
     }
 
     /// Generic on/off access by feature id (used by the Features page).
@@ -48,6 +53,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "measured": return measuredProfiles
         case "deviceMemory": return deviceMemory
         case "surround": return surround.enabled
+        case "leveler": return leveler.enabled
         default: return false
         }
     }
@@ -57,6 +63,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "measured": measuredProfiles = on
         case "deviceMemory": deviceMemory = on
         case "surround": surround.enabled = on
+        case "leveler": leveler.enabled = on
         default: break
         }
     }

@@ -70,7 +70,12 @@ public final class EQProcessor {
 
     public func applyStageParams(_ p: StageParams) {
         stages?.surround?.params = p.surround
+        stages?.leveler?.params = p.leveler
     }
+
+    /// Levelling meters (0 / silence when the feature is off).
+    public var levelerGainDB: Float { stages?.leveler?.currentGainDB ?? 0 }
+    public var loudnessLUFS: Float { stages?.leveler?.loudnessLUFS ?? -120 }
 
     public func reset() {
         state.update(repeating: 0, count: maxChannels * Self.maxFilters * 2)
@@ -110,6 +115,7 @@ public final class EQProcessor {
 
         let o = output
         let surround = right != nil ? stages?.surround : nil
+        let leveler = stages?.leveler
         var minGain: Float = 1
         for t in 0..<frames {
             var l = left[t]
@@ -132,6 +138,7 @@ public final class EQProcessor {
             let g = o.gain * o.polarity
             l *= g; r *= g
 
+            leveler?.process(&l, &r)
             guardState.process(&l, &r)
 
             if o.limiter {
