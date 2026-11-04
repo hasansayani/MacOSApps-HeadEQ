@@ -3,16 +3,23 @@
 /// costs no CPU or memory.
 
 public struct FeatureSettings: Codable, Equatable, Sendable {
+    /// Use measured AutoEQ corrections for built-in headphone models.
+    public var measuredProfiles = true
+
     public init() {}
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let d = FeatureSettings()
-        _ = (c, d)   // each feature decodes its field with `c.value(.key, d.key)`
+        measuredProfiles = c.value(.measuredProfiles, d.measuredProfiles)
     }
 
     /// Catalogue of optional features, in display order.
-    public static let catalogue: [FeatureInfo] = []
+    public static let catalogue: [FeatureInfo] = [
+        FeatureInfo(id: "measured", title: "Measured headphone profiles",
+                    summary: "Built-in models use real AutoEQ measurements (oratory1990, Rtings…) instead of HeadEQ's approximations.",
+                    cost: "No runtime cost", icon: "ruler"),
+    ]
 
     /// Generic on/off access by feature id (used by the Features page).
     public subscript(isOn id: String) -> Bool {
@@ -22,12 +29,14 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
 
     func isOnStorage(_ id: String) -> Bool {
         switch id {
+        case "measured": return measuredProfiles
         default: return false
         }
     }
 
     mutating func setOnStorage(_ id: String, _ on: Bool) {
         switch id {
+        case "measured": measuredProfiles = on
         default: break
         }
     }

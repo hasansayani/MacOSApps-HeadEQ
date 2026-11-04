@@ -22,7 +22,8 @@ final class EQModel: ObservableObject {
     /// While the headphone editor is open, its draft is auditioned live.
     @Published var previewHeadphone: HeadphoneProfile? { didSet { pushDSP() } }
 
-    var headphoneProfiles: [HeadphoneProfile] { customHeadphones + HeadphoneProfile.builtIn }
+    var builtInHeadphones: [HeadphoneProfile] { HeadphoneProfile.builtIn(measured: settings.features.measuredProfiles) }
+    var headphoneProfiles: [HeadphoneProfile] { customHeadphones + builtInHeadphones }
     var musicPresets: [MusicPreset] { MusicPreset.builtIn + customPresets }
 
     let backend: AudioBackend
@@ -146,7 +147,7 @@ final class EQModel: ObservableObject {
     // MARK: Headphones
 
     func newHeadphoneDraft(basedOn base: HeadphoneProfile? = nil) -> HeadphoneProfile {
-        let source = base ?? HeadphoneProfile.builtIn.first { $0.id == "generic-over" }!
+        let source = base ?? builtInHeadphones.first { $0.id == "generic-over" }!
         let name = base.map { "\($0.name) (Custom)" } ?? "My Headphones"
         return HeadphoneProfile(id: "user-hp-\(UUID().uuidString)",
                                 name: uniqueName(name, existing: headphoneProfiles.map(\.name)),
@@ -213,6 +214,7 @@ final class EQModel: ObservableObject {
         if let data = try? JSONEncoder().encode(settings) { defaults.set(data, forKey: Self.settingsKey) }
 
         if settings.output != old.output { backend.update(output: settings.output) }
+        if settings.features.measuredProfiles != old.features.measuredProfiles { pushDSP() }
         if settings.hearing != old.hearing { pushHearing(force: true) }
 
         if settings.enabled != old.enabled || settings.outputDeviceUID != old.outputDeviceUID

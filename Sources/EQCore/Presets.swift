@@ -193,6 +193,21 @@ public struct HeadphoneProfile: Identifiable, Codable, Hashable, Sendable {
                          note: "Mild warmth without overdriving small drivers.", source: .generic),
     ]
 
+    /// Built-ins with measured AutoEQ corrections substituted where available
+    /// (the "Measured profiles" feature). Approximations remain the fallback.
+    public static let builtInMeasured: [HeadphoneProfile] = builtIn.map { p in
+        guard let m = measurements[p.id] else { return p }
+        var q = p
+        q.filters = m.filters
+        q.source = .autoEQ(measuredBy: m.measuredBy, path: m.path, kind: p.kind)
+        if m.entryName.lowercased() != p.name.lowercased(), !p.name.lowercased().contains(m.entryName.lowercased()) {
+            q.note = p.note + " Measured unit: \(m.entryName)."
+        }
+        return q
+    }
+
+    public static func builtIn(measured: Bool) -> [HeadphoneProfile] { measured ? builtInMeasured : builtIn }
+
     /// Pick a profile by matching the OS output-device name.
     public static func match(deviceName: String, in profiles: [HeadphoneProfile] = builtIn) -> HeadphoneProfile? {
         let name = deviceName.lowercased()

@@ -63,7 +63,7 @@ struct HeadphoneCard: View {
                         }
                     }
                     ForEach(HeadphoneKind.allCases, id: \.self) { kind in
-                        let items = HeadphoneProfile.builtIn.filter { $0.kind == kind && $0.id != "none" }
+                        let items = model.builtInHeadphones.filter { $0.kind == kind && $0.id != "none" }
                         if !items.isEmpty {
                             Section(kind.rawValue) { ForEach(items) { Text($0.name).tag($0.id) } }
                         }
