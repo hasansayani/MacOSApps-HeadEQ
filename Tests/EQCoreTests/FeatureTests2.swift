@@ -105,3 +105,27 @@ final class DeviceMemoryTests: XCTestCase {
         XCTAssertNil(mem.snapshot(for: "a"))
     }
 }
+
+final class ThemeTests: XCTestCase {
+    func testPaletteIdsUniqueAndColorsValid() {
+        let ids = ThemePalette.all.map(\.id)
+        XCTAssertEqual(Set(ids).count, ids.count)
+        for p in ThemePalette.all {
+            for hex in [p.accent] + p.gradient + (p.background ?? []) {
+                XCTAssertTrue(hex.hasPrefix("#") && hex.count == 7 && UInt64(hex.dropFirst(), radix: 16) != nil, "\(p.id): \(hex)")
+            }
+            XCTAssertGreaterThanOrEqual(p.gradient.count, 2, p.id)
+        }
+    }
+
+    func testPlayerSkinsAreDarkRetroAndGrouped() {
+        let skins = ThemePalette.all.filter { $0.group == "Player skins" }
+        XCTAssertEqual(skins.count, 5)
+        XCTAssertTrue(skins.allSatisfy { $0.retro && $0.isDark })
+        XCTAssertEqual(ThemePalette.groups, ["HeadEQ", "Player skins"])
+        // Classic base runs green (quiet) → red (loud), like the original spectrum analyser.
+        let classic = ThemePalette.named("skin-classic")
+        XCTAssertEqual(classic.gradient.first, "#18B818")
+        XCTAssertEqual(classic.gradient.last, "#E01010")
+    }
+}

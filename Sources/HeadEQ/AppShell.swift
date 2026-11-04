@@ -183,9 +183,13 @@ struct ContentView: View {
             .help("Output device")
             Menu {
                 Picker("Theme", selection: $themeID) {
-                    ForEach(ThemePalette.all) { p in
-                        Label { Text(p.name) } icon: { Image(systemName: "circle.fill").foregroundStyle(Color(hex: p.accent)) }
-                            .tag(p.id)
+                    ForEach(ThemePalette.groups, id: \.self) { group in
+                        Section(group) {
+                            ForEach(ThemePalette.all.filter { $0.group == group }) { p in
+                                Label { Text(p.name) } icon: { Image(systemName: "circle.fill").foregroundStyle(Color(hex: p.accent)) }
+                                    .tag(p.id)
+                            }
+                        }
                     }
                 }
                 .pickerStyle(.inline)

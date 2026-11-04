@@ -111,7 +111,9 @@ struct SettingsView: View {
             Form {
                 Section("Theme") {
                     Picker("Color theme", selection: $themeID) {
-                        ForEach(ThemePalette.all) { Text($0.name).tag($0.id) }
+                        ForEach(ThemePalette.groups, id: \.self) { group in
+                            Section(group) { ForEach(ThemePalette.all.filter { $0.group == group }) { Text($0.name).tag($0.id) } }
+                        }
                     }
                 }
                 Section("App icon") {
@@ -122,7 +124,7 @@ struct SettingsView: View {
                         ForEach(ThemePalette.all.filter { $0.id != "classic" }) { Text($0.name).tag($0.id) }
                     }
                     HStack(spacing: 10) {
-                        ForEach(["classic", "neon", "synthwave", "ember", "ocean", "forest"], id: \.self) { id in
+                        ForEach(["classic", "neon", "synthwave", "ember", "ocean", "skin-classic", "skin-bento"], id: \.self) { id in
                             if let img = AppIcon.image(style: id, themeID: themeID) {
                                 Image(nsImage: img).resizable().frame(width: 44, height: 44)
                                     .overlay(RoundedRectangle(cornerRadius: 10)

@@ -54,7 +54,8 @@ struct VisualizerView: View {
                     engine.tick(backend: backend, date: timeline.date)
                     let shading = GraphicsContext.Shading.linearGradient(
                         Gradient(colors: theme.gradient),
-                        startPoint: CGPoint(x: 0, y: size.height), endPoint: CGPoint(x: size.width, y: 0))
+                        startPoint: CGPoint(x: 0, y: size.height),
+                        endPoint: theme.palette.retro ? CGPoint(x: 0, y: 0) : CGPoint(x: size.width, y: 0))
                     switch style {
                     case .bars: drawBars(ctx, size, shading)
                     case .spectrum: drawSpectrum(ctx, size, shading)
@@ -71,11 +72,22 @@ struct VisualizerView: View {
         let n = CGFloat(levels.count)
         let slot = size.width / n, w = max(1, slot * 0.72)
         var bars = Path(), caps = Path()
+        let retro = theme.palette.retro
+        let segment: CGFloat = 4, segmentGap: CGFloat = 1.5
         for i in levels.indices {
             let x = CGFloat(i) * slot + (slot - w) / 2
             let h = CGFloat(levels[i]) * size.height
-            bars.addRoundedRect(in: CGRect(x: x, y: size.height - h, width: w, height: h),
-                                cornerSize: CGSize(width: w / 3, height: w / 3))
+            if retro {
+                // LED ladder, like classic player spectrum analysers.
+                var top = size.height
+                while top - segment >= size.height - h {
+                    bars.addRect(CGRect(x: x, y: top - segment, width: w, height: segment))
+                    top -= segment + segmentGap
+                }
+            } else {
+                bars.addRoundedRect(in: CGRect(x: x, y: size.height - h, width: w, height: h),
+                                    cornerSize: CGSize(width: w / 3, height: w / 3))
+            }
             let py = size.height - CGFloat(peaks[i]) * size.height
             caps.addRect(CGRect(x: x, y: py - 2, width: w, height: 2))
         }
