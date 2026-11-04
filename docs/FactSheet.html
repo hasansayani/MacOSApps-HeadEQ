@@ -1,0 +1,290 @@
+<title>HeadEQ Fact Sheet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: hi-fi spec sheet. Masthead, then a narrow "specifications" column beside the main feature content; stacks on phones. */
+  :root {
+    --bg: #f4f6f9;
+    --panel: #ffffff;
+    --ink: #101a2b;
+    --muted: #5a6577;
+    --line: #d9dfe8;
+    --accent: #0a6fe0;
+    --accent-soft: #e3eefc;
+    --good: #0f8a6a;
+    --warn: #a35a00;
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d131c; --panel: #141c28; --ink: #e7edf5; --muted: #98a4b6; --line: #273244;
+      --accent: #5aa9ff; --accent-soft: #16263d; --good: #3fcf9f; --warn: #f0a648; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d131c; --panel: #141c28; --ink: #e7edf5; --muted: #98a4b6; --line: #273244;
+    --accent: #5aa9ff; --accent-soft: #16263d; --good: #3fcf9f; --warn: #f0a648; color-scheme: dark;
+  }
+
+  body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-block: 40px 56px;
+          padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+          display: grid; gap: 28px; }
+
+  /* Masthead */
+  .mast { display: flex; flex-wrap: wrap; gap: 20px 28px; align-items: center; border-bottom: 2px solid var(--ink); padding-bottom: 22px; }
+  .mast svg { width: 84px; height: 84px; flex: none; }
+  .mast-text { flex: 1 1 320px; min-width: 0; display: grid; gap: 6px; }
+  h1 { font: 800 clamp(34px, 6vw, 52px)/1 var(--display); font-stretch: 85%; letter-spacing: -0.01em; margin: 0; }
+  .tagline { font-size: 17px; color: var(--muted); margin: 0; max-width: 60ch; text-wrap: balance; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font: 500 12px/1 var(--mono); padding: 6px 9px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); white-space: nowrap; }
+  .chip strong { color: var(--accent); font-weight: 500; }
+
+  /* Key figures */
+  .figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .fig { background: var(--panel); padding: 16px 18px; display: grid; gap: 2px; }
+  .fig b { font: 700 30px/1.05 var(--display); font-stretch: 80%; font-variant-numeric: tabular-nums; }
+  .fig span { font-size: 13px; color: var(--muted); }
+
+  /* Body grid */
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 28px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  main, aside { display: grid; gap: 28px; min-width: 0; }
+
+  h2 { font: 700 13px/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 12px; color: var(--muted); }
+  h3 { font: 600 16px/1.3 var(--body); margin: 0; }
+  p { margin: 0; }
+  section { min-width: 0; }
+
+  /* Signal chain */
+  .chain { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; counter-reset: step; }
+  .chain li { counter-increment: step; display: flex; gap: 8px; align-items: baseline; padding: 8px 11px; background: var(--panel);
+              border: 1px solid var(--line); border-radius: 4px; font-size: 13.5px; }
+  .chain li::before { content: counter(step); font: 500 11px/1 var(--mono); color: var(--accent); }
+  .chain li.opt { border-style: dashed; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+  /* Feature groups */
+  .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px 24px; }
+  .group { display: grid; gap: 8px; align-content: start; }
+  .group ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+  .group h3 { border-top: 1px solid var(--ink); padding-top: 8px; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  th { font: 600 11.5px/1.2 var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--accent-soft); }
+  td.mono, .mono { font-family: var(--mono); font-size: 12.5px; }
+  .state { font: 500 11.5px/1 var(--mono); padding: 3px 6px; border-radius: 3px; white-space: nowrap; }
+  .on { color: var(--good); border: 1px solid currentColor; }
+  .off { color: var(--muted); border: 1px solid var(--line); }
+
+  /* Spec list (aside) */
+  dl { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+  dl div { display: grid; gap: 2px; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+  dl div:last-child { border-bottom: 0; }
+  dt { font-size: 12px; color: var(--muted); }
+  dd { margin: 0; font: 500 13px/1.45 var(--mono); }
+
+  .caveats { display: grid; gap: 8px; padding: 14px 16px; border: 1px solid var(--line); border-left: 3px solid var(--warn); border-radius: 4px; background: var(--panel); }
+  .caveats ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 13.5px; }
+  .credits { font-size: 13px; color: var(--muted); display: grid; gap: 4px; }
+  footer { border-top: 1px solid var(--line); padding-top: 14px; font-size: 12.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: space-between; }
+  a { color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <svg viewBox="0 0 100 100" role="img" aria-label="HeadEQ app icon">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#64D2FF"/><stop offset=".55" stop-color="#0A84FF"/><stop offset="1" stop-color="#5E5CE6"/>
+        </linearGradient>
+      </defs>
+      <rect x="4" y="4" width="92" height="92" rx="21" fill="url(#g)"/>
+      <path d="M22 58 A28 28 0 0 1 78 58" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round"/>
+      <rect x="16.5" y="54" width="11" height="24" rx="5" fill="#fff"/>
+      <rect x="72.5" y="54" width="11" height="24" rx="5" fill="#fff"/>
+      <rect x="36" y="66" width="4.6" height="12" rx="2.3" fill="#fff"/>
+      <rect x="43" y="59" width="4.6" height="19" rx="2.3" fill="#fff"/>
+      <rect x="50" y="51" width="4.6" height="27" rx="2.3" fill="#fff"/>
+      <rect x="57" y="61" width="4.6" height="17" rx="2.3" fill="#fff"/>
+      <rect x="64" y="65" width="4.6" height="13" rx="2.3" fill="#fff"/>
+    </svg>
+    <div class="mast-text">
+      <h1>HeadEQ</h1>
+      <p class="tagline">A system-wide equalizer for macOS that tunes everything your Mac plays to the exact headphones you're wearing, using measured corrections, with hearing protection built in.</p>
+      <div class="chips">
+        <span class="chip">Version <strong>0.6.0</strong> (build 13)</span>
+        <span class="chip">macOS <strong>14.2+</strong></span>
+        <span class="chip">Apple silicon</span>
+        <span class="chip">Swift · SwiftUI · Core Audio</span>
+        <span class="chip">App size 5.3 MB</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="figures" aria-label="Key figures">
+    <div class="fig"><b>16</b><span>built-in headphone models, all with measured corrections</span></div>
+    <div class="fig"><b>~8,850</b><span>AutoEQ entries searchable by name</span></div>
+    <div class="fig"><b>14</b><span>music presets, plus describe-a-preset</span></div>
+    <div class="fig"><b>10</b><span>optional features, each with an off switch</span></div>
+    <div class="fig"><b>13</b><span>pages in a sectioned sidebar</span></div>
+    <div class="fig"><b>81</b><span>unit tests on the audio core</span></div>
+  </div>
+
+  <div class="grid">
+    <main>
+      <section>
+        <h2>Signal chain</h2>
+        <ol class="chain">
+          <li>Preamp (auto, clip-safe)</li>
+          <li>Headphone correction</li>
+          <li>10-band graphic EQ</li>
+          <li class="opt">Personal hearing correction</li>
+          <li class="opt">Virtual surround</li>
+          <li>Output stage</li>
+          <li class="opt">Volume levelling</li>
+          <li>Hearing protection</li>
+          <li>Peak limiter</li>
+        </ol>
+        <p class="note">Dashed stages are optional features. When switched off they have no object in memory and add no work per sample. In DAC mode, a neutral chain is bypassed entirely, so audio reaches the device bit-perfect.</p>
+      </section>
+
+      <section>
+        <h2>What it does</h2>
+        <div class="groups">
+          <div class="group">
+            <h3>Sound</h3>
+            <ul>
+              <li>Headphone profiles from AutoEQ measurements, auto-detected from the device name</li>
+              <li>Add any headphone by name; edit corrections with live preview</li>
+              <li>Describe a preset in plain words, e.g. “EDM on Bose SoundSport, more bass”</li>
+              <li>Output stage: gain, balance, width, mono, swap, polarity, crossfeed, limiter</li>
+              <li>Virtual surround and LUFS volume levelling</li>
+              <li>DAC mode with per-device sample rate</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h3>Hearing</h3>
+            <ul>
+              <li>Sudden-loudness guard that ignores normal musical dynamics</li>
+              <li>Max listening level and a daily sound-dose meter</li>
+              <li>Per-ear hearing test with a gentle personal correction</li>
+              <li>macOS Background Sounds, including the tinnitus EQ pad and stop timer</li>
+              <li>Headphone Accommodations and AirPods Transparency settings</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h3>Tools</h3>
+            <ul>
+              <li>A/B switching with level matching</li>
+              <li>Blind preference test with a significance check</li>
+              <li>Import and export: .headeq, ParametricEQ.txt, GraphicEQ</li>
+              <li>Preset sync through iCloud Drive or any folder</li>
+              <li>Expert view: tuning source, target curve and filter tables for every profile</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h3>App</h3>
+            <ul>
+              <li>Eight color themes, Dock icon styles and a configurable menu-bar icon</li>
+              <li>Labelled master switch in the toolbar and menu bar</li>
+              <li>Launch at login and daily update checks</li>
+              <li>About window, searchable Help (⌘?) and a bundled User Guide</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Optional features</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Feature</th><th>Default</th><th>Cost when on</th></tr></thead>
+            <tbody>
+              <tr><td>Measured headphone profiles</td><td><span class="state on">On</span></td><td>None</td></tr>
+              <tr><td>Per-device memory</td><td><span class="state off">Off</span></td><td>A few KB of settings</td></tr>
+              <tr><td>Virtual surround</td><td><span class="state off">Off</span></td><td>≈ 70 KB buffers, light per-sample work</td></tr>
+              <tr><td>Volume levelling</td><td><span class="state off">Off</span></td><td>&lt; 1 KB, 4 filters per sample</td></tr>
+              <tr><td>Hearing test &amp; personal correction</td><td><span class="state off">Off</span></td><td>&lt; 1 KB, up to 16 filters per sample</td></tr>
+              <tr><td>DAC mode</td><td><span class="state off">Off</span></td><td>Saves CPU: bypass stops processing</td></tr>
+              <tr><td>A/B &amp; blind comparison</td><td><span class="state off">Off</span></td><td>None</td></tr>
+              <tr><td>Preset sync</td><td><span class="state off">Off</span></td><td>Reads the sync file every 30 s</td></tr>
+              <tr><td>Launch at login</td><td><span class="state off">Off</span></td><td>None</td></tr>
+              <tr><td>Automatic update checks</td><td><span class="state off">Off</span></td><td>One small web request per day</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="caveats" aria-label="Limitations">
+        <h2 style="margin:0">Limitations</h2>
+        <ul>
+          <li>Sound levels, dose and the hearing test are estimates from digital level, device volume and a sensitivity you calibrate. They are not a medical measurement.</li>
+          <li>Background Sounds and Headphone Accommodations controls use the same private settings as System Settings, so a future macOS update may break them. If that happens, the app falls back to System Settings.</li>
+          <li>Audio isn't measured or protected while the equalizer is off.</li>
+          <li>macOS uses one sample rate per device for all apps, so HeadEQ can't follow each track's rate automatically.</li>
+          <li>On iOS, an EQ can only process the app's own audio.</li>
+        </ul>
+      </section>
+    </main>
+
+    <aside>
+      <section>
+        <h2>Specifications</h2>
+        <dl>
+          <div><dt>Audio capture</dt><dd>Core Audio process tap, all apps except HeadEQ</dd></div>
+          <div><dt>Processing</dt><dd>32-bit float, no memory allocation on the audio thread</dd></div>
+          <div><dt>Filters</dt><dd>Biquads per the RBJ Audio EQ Cookbook; up to 22 correction filters plus 10 bands</dd></div>
+          <div><dt>Graphic EQ</dt><dd>32 Hz – 16 kHz, ±12 dB, Q 0.5–4, 0.5 or 0.1 dB steps</dd></div>
+          <div><dt>Loudness</dt><dd>ITU-R BS.1770-4 K-weighting; target −24 to −10 LUFS</dd></div>
+          <div><dt>Surround</dt><dd>Woodworth ITD (≈ 0.26 ms at ±30°), head shadow, 4 early reflections</dd></div>
+          <div><dt>Hearing dose</dt><dd>NIOSH: 85 dB for 8 h, 3 dB exchange rate</dd></div>
+          <div><dt>Hearing test</dt><dd>250 Hz – 8 kHz, 7 points per ear, staircase method</dd></div>
+          <div><dt>Sample rates</dt><dd>Whatever the device supports (44.1 – 384 kHz)</dd></div>
+          <div><dt>Permissions</dt><dd>System audio recording; Apple Events (alert volume only)</dd></div>
+        </dl>
+      </section>
+
+      <section>
+        <h2>Privacy</h2>
+        <dl>
+          <div><dt>Audio</dt><dd>Processed on the Mac; never leaves it</dd></div>
+          <div><dt>Network</dt><dd>AutoEQ on GitHub (Add by Name), and the update feed if enabled</dd></div>
+          <div><dt>Sync</dt><dd>A file in iCloud Drive or a folder you choose</dd></div>
+          <div><dt>Telemetry</dt><dd>None</dd></div>
+        </dl>
+      </section>
+
+      <section>
+        <h2>Built to port</h2>
+        <dl>
+          <div><dt>EQCore</dt><dd>Portable Swift with no Apple frameworks (2,554 lines)</dd></div>
+          <div><dt>macOS app</dt><dd>SwiftUI and Core Audio layer (4,741 lines)</dd></div>
+          <div><dt>Planned backends</dt><dd>iOS AVAudioEngine · Android DynamicsProcessing · Windows WASAPI/APO · Linux PipeWire</dd></div>
+          <div><dt>Release</dt><dd>Developer ID signing, DMG, notarization and stapling script</dd></div>
+          <div><dt>History</dt><dd>Git, 13 commits, one per feature; tags v0.5.0, v0.6.0</dd></div>
+        </dl>
+      </section>
+
+      <section class="credits">
+        <h2>Credits</h2>
+        <p>Headphone measurements from the AutoEQ project by Jaakko Pasanen and its sources: oratory1990, crinacle, Rtings, HypetheSonics and others.</p>
+        <p>Filter design from Robert Bristow-Johnson's Audio EQ Cookbook. Loudness per ITU-R BS.1770-4. Exposure guidance per NIOSH.</p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span>HeadEQ 0.6.0 · Fact sheet · November 2026</span>
+    <span>Not a medical device.</span>
+  </footer>
+</div>
