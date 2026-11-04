@@ -1,0 +1,76 @@
+name: Release
+
+# Push a tag like v0.6.1 to build HeadEQ on macOS and attach the prebuilt
+# binaries (DMG, zip, SHA-256 checksums) to the GitHub release for that tag.
+# If the Developer ID secrets below are set, the app is signed and notarized;
+# otherwise it is ad-hoc signed (users right-click ▸ Open the first time).
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to (re)build, e.g. v0.6.1"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+          fetch-depth: 0          # build number = commit count
+
+      - name: Select newest Xcode
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+
+      - name: Test
+        run: swift test
+
+      - name: Import Developer ID certificate (optional)
+        if: ${{ env.DEVELOPER_ID_P12 != '' }}
+        env:
+          DEVELOPER_ID_P12: ${{ secrets.DEVELOPER_ID_P12 }}
+          DEVELOPER_ID_P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/build.keychain-db"
+          security create-keychain -p "" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "" "$KEYCHAIN"
+          echo "$DEVELOPER_ID_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "$DEVELOPER_ID_P12_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN"
+
+      - name: Build release artifacts
+        env:
+          DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
+          NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
+          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+          NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
+          UPDATE_FEED_URL: https://api.github.com/repos/${{ github.repository }}/releases/latest
+        run: |
+          if [ -n "$DEVELOPER_ID" ] && [ -n "$NOTARY_APPLE_ID" ]; then
+            xcrun notarytool store-credentials headeq-notary --apple-id "$NOTARY_APPLE_ID" \
+              --password "$NOTARY_PASSWORD" --team-id "$NOTARY_TEAM_ID"
+            NOTARY_PROFILE=headeq-notary tools/release.sh
+          else
+            echo "::notice::No Developer ID secrets: building an ad-hoc signed release."
+            tools/release.sh --skip-notarize
+          fi
+
+      - name: Publish to the GitHub release
+        run: |
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          NOTES="$(awk "/^## \\[${VERSION}\\]/{f=1;next} /^## \\[/{f=0} f" CHANGELOG.md)"
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "HeadEQ ${VERSION}" --notes "$NOTES"
+          fi
+          gh release upload "$TAG" "build/HeadEQ-${VERSION}.dmg" "build/HeadEQ-${VERSION}.zip" build/SHA256SUMS.txt --clobber

@@ -5,6 +5,18 @@ Every number on the label below is measured from the code and the built app (`sc
 
 <p align="center"><img src="docs/app-facts-macos.svg" alt="App Facts label for HeadEQ: download size, code, tests, permissions, CPU and memory use" width="388"></p>
 
+## Download
+
+Get the latest **HeadEQ.dmg** (or .zip) from [Releases](https://github.com/hasansayani/MacOSApps-HeadEQ/releases/latest).
+Requires macOS 14.2 or later on Apple silicon. Open the DMG and drag HeadEQ to Applications.
+
+These builds are ad-hoc signed, not notarized. The first time you open it, macOS blocks the app; go to System Settings ▸ Privacy & Security
+and click **Open Anyway** (or right-click the app ▸ Open). Check the download against `SHA256SUMS.txt`:
+
+```bash
+shasum -a 256 -c SHA256SUMS.txt
+```
+
 **Docs:** [User Guide](docs/UserGuide.md) · [Architecture & porting](docs/Architecture.md) · [Changelog](CHANGELOG.md) · current version in `VERSION`
 
 System-wide equalizer for macOS (14.2+), with headphone-correction profiles and music presets.
@@ -18,6 +30,18 @@ scripts/app_facts.py --render-only   # redraw from docs/app-facts-macos.json
 ```
 Writes `docs/app-facts-macos.svg` (the label), `.json` (raw measurements) and `.label.json` (drawing ops). Wording that
 can't be measured lives in `docs/app-facts.config.json`. Same format and generator as the other apps in this workspace.
+
+## Releasing
+
+Bump `VERSION`, add a `CHANGELOG.md` entry, then tag and push:
+
+```bash
+git tag v0.6.2 && git push origin v0.6.2
+```
+
+GitHub Actions (`.github/workflows/release.yml`) tests, builds and attaches the DMG, zip and checksums to the release.
+Add the secrets `DEVELOPER_ID`, `DEVELOPER_ID_P12` (base64), `DEVELOPER_ID_P12_PASSWORD`, `NOTARY_APPLE_ID`, `NOTARY_PASSWORD`
+and `NOTARY_TEAM_ID` to get Developer ID–signed, notarized builds. Locally: `tools/release.sh --skip-notarize`.
 
 ## Build & run
 

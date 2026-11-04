@@ -18,6 +18,7 @@ UPDATE_FEED_URL="${UPDATE_FEED_URL:-}" ./build_app.sh
 APP="build/HeadEQ.app"
 VERSION="$(cat VERSION | tr -d '[:space:]')"
 DMG="build/HeadEQ-${VERSION}.dmg"
+ZIP="build/HeadEQ-${VERSION}.zip"
 
 if [[ $SKIP_NOTARIZE == 0 ]]; then
   : "${DEVELOPER_ID:?Set DEVELOPER_ID to your 'Developer ID Application: …' identity}"
@@ -40,4 +41,12 @@ if [[ $SKIP_NOTARIZE == 0 ]]; then
   xcrun stapler staple "$DMG"
   spctl --assess --type open --context context:primary-signature -v "$DMG"
 fi
-echo "Release artifact: $DMG"
+# Zip of the app (same signed bundle) for people who prefer it to a disk image.
+rm -f "$ZIP"
+ditto -c -k --sequesterRsrc --keepParent "$APP" "$ZIP"
+
+( cd build && shasum -a 256 "$(basename "$DMG")" "$(basename "$ZIP")" > SHA256SUMS.txt )
+echo "Release artifacts:"
+echo "  $DMG"
+echo "  $ZIP"
+echo "  build/SHA256SUMS.txt"

@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0",
+  "version": "0.6.1",
   "min_os": "14.2",
   "tests": {
     "passed": 82,
@@ -12,11 +12,11 @@
     "functions_pct": 83.5
   },
   "size": {
-    "app_bytes": 5641186,
+    "app_bytes": 5641773,
     "slices": {
       "arm64": 4521232
     },
-    "download_bytes": 2241019
+    "download_bytes": 2241313
   },
   "signing": {
     "signature": "Ad-hoc",
