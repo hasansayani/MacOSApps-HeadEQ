@@ -58,3 +58,50 @@ final class MeasuredProfileTests: XCTestCase {
         }
     }
 }
+
+final class DeviceMemoryTests: XCTestCase {
+    func testSwitchingSavesAndRestores() {
+        var mem = DeviceMemory()
+        var headphones = EQSettings()
+        headphones.headphoneProfileID = "sony-xm3"
+        headphones.bandGains = [3, 2, 1, 0, 0, 0, 0, 0, 1, 2]
+        headphones.output.crossfeed = 0.4
+
+        // Switch from headphones to an unknown DAC: settings carry over unchanged.
+        let onDAC = mem.switching(from: ("hp-uid", "WH-1000XM3"), to: "dac-uid", current: headphones)
+        XCTAssertEqual(onDAC, headphones)
+
+        // Tweak the DAC, switch back: the headphones' own settings return.
+        var dacSettings = onDAC
+        dacSettings.headphoneProfileID = "hd600"
+        dacSettings.bandGains = Array(repeating: 0, count: 10)
+        dacSettings.output.crossfeed = 0
+        let back = mem.switching(from: ("dac-uid", "USB DAC"), to: "hp-uid", current: dacSettings)
+        XCTAssertEqual(back.headphoneProfileID, "sony-xm3")
+        XCTAssertEqual(back.bandGains, headphones.bandGains)
+        XCTAssertEqual(back.output.crossfeed, 0.4)
+
+        // And the DAC was remembered.
+        XCTAssertEqual(mem.snapshot(for: "dac-uid")?.headphoneProfileID, "hd600")
+        XCTAssertEqual(mem.snapshot(for: "dac-uid")?.deviceName, "USB DAC")
+    }
+
+    func testGlobalOptionsAreNotOverwritten() {
+        var mem = DeviceMemory()
+        var a = EQSettings(); a.hearing.maxLevelSPL = 80; a.enabled = true
+        mem.remember(a, deviceUID: "x", deviceName: "X")
+        var current = EQSettings(); current.hearing.maxLevelSPL = 95; current.enabled = false
+        let restored = mem.snapshot(for: "x")!.applied(to: current)
+        XCTAssertEqual(restored.hearing.maxLevelSPL, 95)
+        XCTAssertFalse(restored.enabled)
+    }
+
+    func testForgetAndCodable() throws {
+        var mem = DeviceMemory()
+        mem.remember(EQSettings(), deviceUID: "a", deviceName: "A")
+        let back = try JSONDecoder().decode(DeviceMemory.self, from: JSONEncoder().encode(mem))
+        XCTAssertEqual(back, mem)
+        mem.forget("a")
+        XCTAssertNil(mem.snapshot(for: "a"))
+    }
+}

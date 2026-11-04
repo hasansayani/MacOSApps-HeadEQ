@@ -317,6 +317,21 @@ struct OutputCard: View {
             }
             Section2(title: "Device", icon: "hifispeaker") {
                 SampleRatePicker()
+                if model.settings.features.deviceMemory {
+                    Label(model.activeDevice.flatMap { model.deviceMemory.snapshot(for: $0.uid) } != nil
+                          ? "Settings are remembered for this device" : "This device's settings will be remembered",
+                          systemImage: "memorychip").font(.caption).foregroundStyle(.secondary)
+                    ForEach(model.deviceMemory.snapshots.sorted { $0.value.deviceName < $1.value.deviceName }, id: \.key) { uid, snap in
+                        HStack {
+                            Text(snap.deviceName).font(.caption)
+                            Spacer()
+                            Text(model.headphoneProfiles.first { $0.id == snap.headphoneProfileID }?.name ?? "—")
+                                .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                            Button { model.forgetDevice(uid) } label: { Image(systemName: "xmark.circle") }
+                                .buttonStyle(.borderless).help("Forget this device")
+                        }
+                    }
+                }
                 Text(model.activeDevice.map { "\($0.name) · \($0.transport.rawValue)\($0.isLikelyExternalDAC ? " · external DAC" : "") · \($0.channels) ch" } ?? "No device")
                     .font(.caption).foregroundStyle(.secondary)
             }

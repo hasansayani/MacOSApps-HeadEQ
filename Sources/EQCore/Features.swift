@@ -5,6 +5,8 @@
 public struct FeatureSettings: Codable, Equatable, Sendable {
     /// Use measured AutoEQ corrections for built-in headphone models.
     public var measuredProfiles = true
+    /// Remember settings per output device and restore them on reconnect.
+    public var deviceMemory = false
 
     public init() {}
 
@@ -12,6 +14,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let d = FeatureSettings()
         measuredProfiles = c.value(.measuredProfiles, d.measuredProfiles)
+        deviceMemory = c.value(.deviceMemory, d.deviceMemory)
     }
 
     /// Catalogue of optional features, in display order.
@@ -19,6 +22,9 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         FeatureInfo(id: "measured", title: "Measured headphone profiles",
                     summary: "Built-in models use real AutoEQ measurements (oratory1990, Rtings…) instead of HeadEQ's approximations.",
                     cost: "No runtime cost", icon: "ruler"),
+        FeatureInfo(id: "deviceMemory", title: "Per-device memory",
+                    summary: "Each headphone, DAC or speaker remembers its own profile, preset and output settings, restored automatically when it connects.",
+                    cost: "No audio cost · a few KB of settings", icon: "memorychip"),
     ]
 
     /// Generic on/off access by feature id (used by the Features page).
@@ -30,6 +36,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
     func isOnStorage(_ id: String) -> Bool {
         switch id {
         case "measured": return measuredProfiles
+        case "deviceMemory": return deviceMemory
         default: return false
         }
     }
@@ -37,6 +44,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
     mutating func setOnStorage(_ id: String, _ on: Bool) {
         switch id {
         case "measured": measuredProfiles = on
+        case "deviceMemory": deviceMemory = on
         default: break
         }
     }

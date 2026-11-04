@@ -32,6 +32,8 @@ final class EQModel: ObservableObject {
     private static let customPresetsKey = "customPresets.v1"
     private static let customHeadphonesKey = "customHeadphones.v1"
     private static let exposureKey = "exposure.v1"
+    private static let deviceMemoryKey = "deviceMemory.v1"
+    @Published private(set) var deviceMemory = DeviceMemory()
     private var hearingTimer: Timer?
     private var lastCapDBFS: Double = .nan
     private var tickCount = 0
@@ -45,6 +47,7 @@ final class EQModel: ObservableObject {
         settings = Self.load(EQSettings.self, key: Self.settingsKey) ?? EQSettings()
         customPresets = Self.load([MusicPreset].self, key: Self.customPresetsKey) ?? []
         customHeadphones = Self.load([HeadphoneProfile].self, key: Self.customHeadphonesKey) ?? []
+        deviceMemory = Self.load(DeviceMemory.self, key: Self.deviceMemoryKey) ?? DeviceMemory()
         if let saved = Self.load(ExposureMeter.self, key: Self.exposureKey), saved.day == Self.today() {
             exposure = saved
         }
@@ -212,6 +215,10 @@ final class EQModel: ObservableObject {
 
     private func settingsChanged(from old: EQSettings) {
         if let data = try? JSONEncoder().encode(settings) { defaults.set(data, forKey: Self.settingsKey) }
+        if settings.features.deviceMemory, let d = activeDevice, !isSwitchingDevice {
+            deviceMemory.remember(settings, deviceUID: d.uid, deviceName: d.name)
+            persistDeviceMemory()
+        }
 
         if settings.output != old.output { backend.update(output: settings.output) }
         if settings.features.measuredProfiles != old.features.measuredProfiles { pushDSP() }
@@ -241,6 +248,16 @@ final class EQModel: ObservableObject {
             backend.stop(); activeDevice = nil
             status = .failed("No output device")
             return
+        }
+
+        // Per-device memory: restore the incoming device's own settings.
+        if settings.features.deviceMemory, let previous = activeDevice, previous.uid != target.uid {
+            isSwitchingDevice = true
+            let restored = deviceMemory.switching(from: (previous.uid, previous.name), to: target.uid, current: settings)
+            if deviceMemory.snapshot(for: target.uid) != nil { autoDetectedForUID = target.uid }
+            if restored != settings { settings = restored }
+            isSwitchingDevice = false
+            persistDeviceMemory()
         }
 
         if settings.autoDetectHeadphones, autoDetectedForUID != target.uid {
@@ -317,6 +334,17 @@ final class EQModel: ObservableObject {
         guard force || lastCapDBFS.isNaN || abs(cap - lastCapDBFS) > 0.25 else { return }
         lastCapDBFS = cap
         backend.update(hearing: settings.hearing.realtime(sampleRate: backend.sampleRate, capDBFS: cap))
+    }
+
+    private var isSwitchingDevice = false
+
+    func forgetDevice(_ uid: String) {
+        deviceMemory.forget(uid)
+        persistDeviceMemory()
+    }
+
+    private func persistDeviceMemory() {
+        if let data = try? JSONEncoder().encode(deviceMemory) { defaults.set(data, forKey: Self.deviceMemoryKey) }
     }
 
     private func persistExposure() {
