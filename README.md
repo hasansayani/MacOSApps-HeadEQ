@@ -49,6 +49,17 @@ The two preset layers stack:
   - Dock and menu-bar visibility, menu-bar icon choice and optional preset name (Settings ⌘,)
   - About window
   - Searchable Help (⌘?) and a bundled HTML User Guide
+- **Optional features (0.6)**, each with an on/off switch that removes its processing when off:
+  - Measured profiles for every built-in model
+  - Per-device memory
+  - Virtual surround
+  - Volume levelling (LUFS)
+  - Hearing test with per-ear correction
+  - DAC mode (bit-perfect bypass)
+  - A/B and blind comparison
+  - Import/export and sync
+  - Launch at login and update checks
+  - Notarized release script (`tools/release.sh`)
 - **Expert: tuning sources**: for every headphone profile it shows:
   - Whether it's **measured** (and who measured it, plus a link to the data), an **approximation**, **generic**, **yours** or **modified**
   - The target curve

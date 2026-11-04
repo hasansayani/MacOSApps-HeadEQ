@@ -83,7 +83,37 @@ Controls macOS's Accessibility Background Sounds.
 - The exact filters (type, frequency, gain, Q), the music curve's origin and the whole signal chain in processing order.
 - **Copy** the EQ as Equalizer APO / AutoEQ *ParametricEQ* text.
 
+## Optional features
+
+The **Features** page lists every optional feature with an on/off switch and what it costs. When a feature is off it uses no processing and no memory. Each feature's page also has its switch at the top.
+
+| Feature | Page | What it does |
+|---|---|---|
+| Measured headphone profiles | Equalizer | Real AutoEQ measurements for all built-in models (on by default) |
+| Per-device memory | Output | Each device keeps its own profile, preset and output settings |
+| Virtual surround | Spatial | Speaker simulation: interaural delay, head shadow, room reflections |
+| Volume levelling | Loudness | Evens out loudness (LUFS, ITU BS.1770) without squashing dynamics |
+| Hearing test & personal correction | Hearing Test | Per-ear tone test and a gentle per-ear correction |
+| DAC mode | DAC Mode | Bit-perfect bypass when neutral; preferred sample rate per device |
+| A/B & blind comparison | Compare | Instant, level-matched switching and blind preference tests |
+| Preset sync | Library & Sync | Sync presets and headphones through iCloud Drive or any folder |
+| Launch at login, update checks | Settings ▸ General | Start with your Mac; daily check for new versions |
+
+### Hearing test
+
+Use your usual headphones in a quiet room with the volume around 50 %, and don't change the volume during the test. Press **Space** when you hear the three beeps and **N** when you don't. Results are relative to your best threshold; *Strength* 50 % applies the classic half-gain rule. This is not a medical test.
+
+### DAC mode
+
+When nothing in the chain changes the sound, HeadEQ steps out of the audio path entirely, so apps reach your DAC bit-perfect. The DAC page lists exactly what's preventing bypass. You can also remember a hardware sample rate per device.
+
+### Library & Sync
+
+Export and import `.headeq` libraries, AutoEQ/Equalizer APO *ParametricEQ* files and Wavelet *GraphicEQ* files. Preset sync merges through iCloud Drive (or a folder you choose) and only ever adds items.
+
 ## Settings (⌘,)
+
+- **General**: launch at login, automatic update checks and *Check now*.
 
 - **Appearance**: color theme, Dock icon style (Classic, any theme, or *Match color theme*), show in Dock.
 - **Menu Bar**: show/hide the icon, choose its style, show the current preset name.

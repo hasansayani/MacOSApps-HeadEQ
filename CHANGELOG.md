@@ -2,6 +2,20 @@
 
 All notable changes to HeadEQ. Versions follow [Semantic Versioning](https://semver.org); the version lives in `VERSION`, and the build number is the git commit count.
 
+## [0.6.0] — 2026-11-04
+### Added
+- **Features page** with an on/off switch for every optional feature; switched-off features allocate no DSP and schedule no work. Sidebar grouped into Sound / Hearing / Tools / App.
+- **Measured headphone profiles**: all 15 built-in models use AutoEQ measurements (default on).
+- **Per-device memory**: settings saved and restored per output device.
+- **Virtual surround** (Spatial page): speaker simulation with ITD, head shadow and early reflections.
+- **Volume levelling** (Loudness page): LUFS levelling with exact ITU-R BS.1770-4 K-weighting.
+- **Hearing test & personal correction**: per-ear staircase test, audiogram, half-gain-rule correction per ear.
+- **DAC mode**: bit-perfect bypass when neutral (with reasons), per-device preferred sample rate, hardware format.
+- **A/B & blind comparison** (Compare page) with level matching and binomial significance.
+- **Library & Sync**: .headeq / ParametricEQ / GraphicEQ import & export; folder sync via iCloud Drive.
+- **Launch at login**, **daily update checks**, and `tools/release.sh` for Developer ID signing, DMG, notarization and stapling.
+- 81 unit tests.
+
 ## [0.5.0] — 2026-11-04
 ### Added
 - **System Audio** page: device volume, mute and balance; alert volume; UI sound effects, volume-change feedback, flash screen on alert.
