@@ -222,6 +222,7 @@ final class EQModel: ObservableObject {
 
         if settings.output != old.output { backend.update(output: settings.output) }
         if settings.features.measuredProfiles != old.features.measuredProfiles { pushDSP() }
+        if settings.features.processing != old.features.processing { backend.update(processing: settings.features.processing) }
         if settings.hearing != old.hearing { pushHearing(force: true) }
 
         if settings.enabled != old.enabled || settings.outputDeviceUID != old.outputDeviceUID
@@ -278,6 +279,7 @@ final class EQModel: ObservableObject {
             try backend.start(device: target)
             pushDSP()
             backend.update(output: settings.output)
+            backend.update(processing: settings.features.processing)
             pushHearing(force: true)
             status = .running(deviceName: target.name, sampleRate: backend.sampleRate)
         } catch {

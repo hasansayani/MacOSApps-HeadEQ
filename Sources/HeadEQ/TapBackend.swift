@@ -25,6 +25,18 @@ final class TapBackend: AudioBackend {
     var protectionReductionDB: Float { renderer.processor.protectionReductionDB }
     var outputLevelDBFS: Float { renderer.processor.outputLevelDBFS }
     private var lastHearing = RealtimeHearing()
+    private var lastProcessing = ProcessingConfig()
+    private var installedSignature = StageSignature()
+
+    func update(processing: ProcessingConfig) {
+        lastProcessing = processing
+        // Build stage objects only when the set of enabled features changes.
+        if processing.signature != installedSignature || !renderer.hasStageSet(for: processing.signature) {
+            installedSignature = processing.signature
+            renderer.post(stages: processing.signature.isEmpty ? nil : StageSet(surround: processing.signature.surround))
+        }
+        renderer.post(stageParams: processing.realtime(sampleRate: sampleRate))
+    }
 
     func update(hearing: RealtimeHearing) {
         lastHearing = hearing
@@ -85,6 +97,7 @@ final class TapBackend: AudioBackend {
             update(filters: lastFilters, preampDB: lastPreamp)
             update(output: lastOutput)
             update(hearing: lastHearing)
+            renderer.post(stageParams: lastProcessing.realtime(sampleRate: sampleRate))
 
             let renderer = self.renderer
             try check(AudioDeviceCreateIOProcIDWithBlock(&ioProcID, aggregateID, ioQueue) { _, input, _, output, _ in
@@ -222,6 +235,35 @@ private final class Renderer {
     private var pendingHearing = RealtimeHearing()
     private var hearingDirty = false
 
+    // Stage set mailbox. The audio thread swaps sets and parks the old one in
+    // `retired`; it's released here on the main thread, never on the audio thread.
+    private var pendingStages: StageSet?
+    private var stagesDirty = false
+    private var retired: StageSet?
+    private var postedStages: StageSet?
+    private var pendingStageParams = StageParams()
+    private var stageParamsDirty = false
+
+    func hasStageSet(for sig: StageSignature) -> Bool { sig.isEmpty ? postedStages == nil : postedStages?.signature == sig }
+
+    func post(stages: StageSet?) {
+        os_unfair_lock_lock(lock)
+        let toFree = retired
+        retired = nil
+        pendingStages = stages
+        postedStages = stages
+        stagesDirty = true
+        os_unfair_lock_unlock(lock)
+        _ = toFree   // released here, on the caller's (main) thread
+    }
+
+    func post(stageParams: StageParams) {
+        os_unfair_lock_lock(lock)
+        pendingStageParams = stageParams
+        stageParamsDirty = true
+        os_unfair_lock_unlock(lock)
+    }
+
     func post(hearing: RealtimeHearing) {
         os_unfair_lock_lock(lock)
         pendingHearing = hearing
@@ -250,6 +292,17 @@ private final class Renderer {
             if dirty {
                 processor.apply(UnsafeBufferPointer(start: pending, count: pendingCount), preampDB: pendingPreamp)
                 dirty = false
+            }
+            if stagesDirty {
+                let old = processor.installStages(pendingStages)
+                if old != nil { retired = old }
+                pendingStages = nil
+                stagesDirty = false
+                stageParamsDirty = true
+            }
+            if stageParamsDirty {
+                processor.applyStageParams(pendingStageParams)
+                stageParamsDirty = false
             }
             if hearingDirty {
                 processor.applyHearing(pendingHearing)

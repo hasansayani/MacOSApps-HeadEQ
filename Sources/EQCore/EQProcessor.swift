@@ -18,6 +18,8 @@ public final class EQProcessor {
     private var lpL: Float = 0, lpR: Float = 0      // crossfeed low-pass state
     private var limiterGain: Float = 1
     private var guardState = HearingGuard()
+    /// Optional stages (only allocated for features that are on).
+    private var stages: StageSet?
     /// Hearing-protection gain reduction (dB, ≤ 0) and output level (dBFS RMS). For metering.
     public var protectionReductionDB: Float { guardState.reductionDB }
     public var outputLevelDBFS: Float { guardState.outputLevelDBFS }
@@ -58,6 +60,18 @@ public final class EQProcessor {
     public func applyOutput(_ params: RealtimeOutput) { output = params }
     public func applyHearing(_ params: RealtimeHearing) { guardState.params = params }
 
+    /// Swap in a new stage set; returns the previous one so the caller can
+    /// release it off the audio thread.
+    public func installStages(_ new: StageSet?) -> StageSet? {
+        let old = stages
+        stages = new
+        return old
+    }
+
+    public func applyStageParams(_ p: StageParams) {
+        stages?.surround?.params = p.surround
+    }
+
     public func reset() {
         state.update(repeating: 0, count: maxChannels * Self.maxFilters * 2)
         lpL = 0; lpR = 0; limiterGain = 1
@@ -95,10 +109,13 @@ public final class EQProcessor {
         if let right { process(channel: 1, samples: right, frames: frames) }
 
         let o = output
+        let surround = right != nil ? stages?.surround : nil
         var minGain: Float = 1
         for t in 0..<frames {
             var l = left[t]
             var r = right?[t] ?? l
+
+            surround?.process(&l, &r)
 
             if o.swap { swap(&l, &r) }
             if o.crossfeed > 0 {

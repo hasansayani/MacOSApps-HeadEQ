@@ -56,6 +56,8 @@ public protocol AudioBackend: AnyObject {
     var visualizerRing: SampleRing { get }
     /// Current limiter gain reduction in dB (≤ 0), for metering.
     var limiterReductionDB: Float { get }
+    /// Optional processing stages (nil members = feature off, nothing allocated).
+    func update(processing: ProcessingConfig)
     /// Hearing protection: parameters, gain reduction and output level for metering.
     func update(hearing: RealtimeHearing)
     var protectionReductionDB: Float { get }
