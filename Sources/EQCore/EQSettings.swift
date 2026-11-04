@@ -14,6 +14,7 @@ public struct EQSettings: Codable, Equatable, Sendable {
     public var graphicQ: Double = GraphicEQ.q
     public var output = OutputSettings()
     public var hearing = HearingProtectionSettings()
+    public var features = FeatureSettings()
 
     public init() {}
 
@@ -34,6 +35,7 @@ public struct EQSettings: Codable, Equatable, Sendable {
         graphicQ = try c.decodeIfPresent(Double.self, forKey: .graphicQ) ?? d.graphicQ
         output = try c.decodeIfPresent(OutputSettings.self, forKey: .output) ?? d.output
         hearing = try c.decodeIfPresent(HearingProtectionSettings.self, forKey: .hearing) ?? d.hearing
+        features = c.value(.features, d.features)
     }
 
     /// The full filter chain: headphone correction followed by the graphic EQ.

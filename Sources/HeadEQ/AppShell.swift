@@ -2,8 +2,23 @@ import EQCore
 import SwiftUI
 
 enum Page: String, CaseIterable, Identifiable {
-    case equalizer, output, system, hearing, background, expert
+    case equalizer, output, system, hearing, background, expert, features
     var id: String { rawValue }
+
+    /// Sidebar grouping.
+    enum Group: String, CaseIterable { case sound = "Sound", hearing = "Hearing", tools = "Tools", app = "App" }
+
+    var group: Group {
+        switch self {
+        case .equalizer, .output: return .sound
+        case .hearing, .background: return .hearing
+        case .expert: return .tools
+        case .system, .features: return .app
+        }
+    }
+
+    /// Optional feature this page belongs to (shows its on/off switch on the page).
+    var featureID: String? { nil }
 
     var title: String {
         switch self {
@@ -13,6 +28,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .hearing: return "Hearing Protection"
         case .background: return "Background Sounds"
         case .expert: return "Expert"
+        case .features: return "Features"
         }
     }
 
@@ -24,6 +40,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .hearing: return "ear"
         case .background: return "cloud.rain"
         case .expert: return "info.circle"
+        case .features: return "switch.2"
         }
     }
 
@@ -35,6 +52,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .hearing: return "Spike guard, level cap and today's sound dose"
         case .background: return "macOS Accessibility Background Sounds"
         case .expert: return "Where each tuning comes from, and the full signal chain"
+        case .features: return "Turn optional features on or off. Off means no processing and no memory used."
         }
     }
 }
@@ -52,8 +70,19 @@ struct ContentView: View {
         let theme = AppTheme.named(themeID)
         NavigationSplitView {
             List(selection: Binding(get: { page }, set: { if let p = $0 { pageID = p.rawValue } })) {
-                ForEach(Page.allCases) { p in
-                    Label(p.title, systemImage: p.icon).tag(p)
+                ForEach(Page.Group.allCases, id: \.self) { group in
+                    Section(group.rawValue) {
+                        ForEach(Page.allCases.filter { $0.group == group }) { p in
+                            HStack {
+                                Label(p.title, systemImage: p.icon)
+                                Spacer()
+                                if let f = p.featureID, !model.settings.features[isOn: f] {
+                                    Text("Off").font(.caption2).foregroundStyle(.secondary)
+                                }
+                            }
+                            .tag(p)
+                        }
+                    }
                 }
             }
             .navigationSplitViewColumnWidth(min: 190, ideal: 210, max: 260)
@@ -66,7 +95,10 @@ struct ContentView: View {
                         Text(page.subtitle).foregroundStyle(.secondary)
                     }
                     DoseBanner()
-                    pageContent
+                    if let f = page.featureID { FeatureSwitchBar(featureID: f) }
+                    if page.featureID.map({ model.settings.features[isOn: $0] }) ?? true {
+                        pageContent
+                    }
                 }
                 .padding(24)
                 .frame(maxWidth: 1200, alignment: .leading)
@@ -94,6 +126,7 @@ struct ContentView: View {
         case .hearing: HearingProtectionCard()
         case .background: BackgroundSoundsCard()
         case .expert: ExpertView()
+        case .features: FeaturesPage()
         }
     }
 
@@ -132,6 +165,65 @@ struct ContentView: View {
             .padding(.horizontal, 6)
             .help("Master switch: turn the equalizer on or off (off = completely untouched audio)")
         }
+    }
+}
+
+/// All optional features with their switches and costs.
+struct FeaturesPage: View {
+    @EnvironmentObject var model: EQModel
+    @AppStorage("page") private var pageID = Page.equalizer.rawValue
+
+    var body: some View {
+        let items = FeatureSettings.catalogue
+        let half = (items.count + 1) / 2
+        TwoColumns {
+            ForEach(items.prefix(half)) { card($0) }
+        } right: {
+            ForEach(items.dropFirst(half)) { card($0) }
+        }
+    }
+
+    private func card(_ f: FeatureInfo) -> some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Label(f.title, systemImage: f.icon).font(.headline)
+                    Spacer()
+                    Toggle("", isOn: $model.settings.features[isOn: f.id]).toggleStyle(.switch).labelsHidden()
+                }
+                Text(f.summary).font(.callout).fixedSize(horizontal: false, vertical: true)
+                HStack {
+                    Label(f.cost, systemImage: "cpu").font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    if let page = Page.allCases.first(where: { $0.featureID == f.id }) {
+                        Button("Open") { pageID = page.rawValue }.controlSize(.small)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// The on/off switch shown at the top of a feature's page.
+struct FeatureSwitchBar: View {
+    @EnvironmentObject var model: EQModel
+    let featureID: String
+
+    var body: some View {
+        let info = FeatureSettings.catalogue.first { $0.id == featureID }
+        let on = model.settings.features[isOn: featureID]
+        HStack(spacing: 10) {
+            Image(systemName: on ? "checkmark.circle.fill" : "power.circle").foregroundStyle(on ? .green : .secondary)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(on ? "\(info?.title ?? "Feature") is on" : "\(info?.title ?? "Feature") is off").font(.callout.bold())
+                Text(on ? (info?.cost ?? "") : "Turn it on to use it. While off it uses no processing or memory.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Toggle("", isOn: $model.settings.features[isOn: featureID]).toggleStyle(.switch).labelsHidden()
+        }
+        .padding(10)
+        .background(RoundedRectangle(cornerRadius: 10).fill(Color.secondary.opacity(0.08)))
     }
 }
 
