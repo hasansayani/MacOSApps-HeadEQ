@@ -71,6 +71,7 @@ public final class EQProcessor {
     public func applyStageParams(_ p: StageParams) {
         stages?.surround?.params = p.surround
         stages?.leveler?.params = p.leveler
+        stages?.personal?.params = p.personal
     }
 
     /// Levelling meters (0 / silence when the feature is off).
@@ -116,11 +117,13 @@ public final class EQProcessor {
         let o = output
         let surround = right != nil ? stages?.surround : nil
         let leveler = stages?.leveler
+        let personal = stages?.personal
         var minGain: Float = 1
         for t in 0..<frames {
             var l = left[t]
             var r = right?[t] ?? l
 
+            personal?.process(&l, &r)
             surround?.process(&l, &r)
 
             if o.swap { swap(&l, &r) }

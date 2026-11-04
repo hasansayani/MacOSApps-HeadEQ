@@ -7,29 +7,37 @@
 public final class StageSet {
     public let surround: SurroundStage?
     public let leveler: LevelerStage?
+    public let personal: PersonalEQStage?
 
-    public init(surround: Bool = false, leveler: Bool = false) {
+    public init(surround: Bool = false, leveler: Bool = false, personal: Bool = false) {
         self.surround = surround ? SurroundStage() : nil
         self.leveler = leveler ? LevelerStage() : nil
+        self.personal = personal ? PersonalEQStage() : nil
     }
 
-    public convenience init(_ sig: StageSignature) { self.init(surround: sig.surround, leveler: sig.leveler) }
+    public convenience init(_ sig: StageSignature) { self.init(surround: sig.surround, leveler: sig.leveler, personal: sig.personal) }
 
     /// Which stages exist (used to decide whether a new set must be built).
-    public var signature: StageSignature { StageSignature(surround: surround != nil, leveler: leveler != nil) }
+    public var signature: StageSignature {
+        StageSignature(surround: surround != nil, leveler: leveler != nil, personal: personal != nil)
+    }
 }
 
 public struct StageSignature: Equatable, Sendable {
     public var surround = false
     public var leveler = false
-    public init(surround: Bool = false, leveler: Bool = false) { self.surround = surround; self.leveler = leveler }
-    public var isEmpty: Bool { !surround && !leveler }
+    public var personal = false
+    public init(surround: Bool = false, leveler: Bool = false, personal: Bool = false) {
+        self.surround = surround; self.leveler = leveler; self.personal = personal
+    }
+    public var isEmpty: Bool { !surround && !leveler && !personal }
 }
 
 /// Real-time parameters for all stages (copied by value; never allocates).
 public struct StageParams: Sendable {
     public var surround = RealtimeSurround()
     public var leveler = RealtimeLeveler()
+    public var personal = RealtimePersonal()
     public init() {}
 }
 
@@ -37,16 +45,20 @@ public struct StageParams: Sendable {
 public struct ProcessingConfig: Equatable, Sendable {
     public var surround: SurroundSettings?
     public var leveler: LevelerSettings?
-    public init(surround: SurroundSettings? = nil, leveler: LevelerSettings? = nil) {
-        self.surround = surround; self.leveler = leveler
+    public var personal: PersonalCorrectionSettings?
+    public init(surround: SurroundSettings? = nil, leveler: LevelerSettings? = nil, personal: PersonalCorrectionSettings? = nil) {
+        self.surround = surround; self.leveler = leveler; self.personal = personal
     }
 
-    public var signature: StageSignature { StageSignature(surround: surround != nil, leveler: leveler != nil) }
+    public var signature: StageSignature {
+        StageSignature(surround: surround != nil, leveler: leveler != nil, personal: personal != nil)
+    }
 
     public func realtime(sampleRate: Double) -> StageParams {
         var p = StageParams()
         if let surround { p.surround = surround.realtime(sampleRate: sampleRate) }
         if let leveler { p.leveler = leveler.realtime(sampleRate: sampleRate) }
+        if let personal { p.personal = personal.realtime(sampleRate: sampleRate) }
         return p
     }
 }

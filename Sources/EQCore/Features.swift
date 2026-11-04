@@ -9,6 +9,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
     public var deviceMemory = false
     public var surround = SurroundSettings()
     public var leveler = LevelerSettings()
+    public var personal = PersonalCorrectionSettings()
 
     public init() {}
 
@@ -19,6 +20,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         deviceMemory = c.value(.deviceMemory, d.deviceMemory)
         surround = c.value(.surround, d.surround)
         leveler = c.value(.leveler, d.leveler)
+        personal = c.value(.personal, d.personal)
     }
 
     /// Catalogue of optional features, in display order.
@@ -35,11 +37,17 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         FeatureInfo(id: "leveler", title: "Volume levelling",
                     summary: "Evens out loudness between songs, apps and videos with a slow, transparent gain ride measured in LUFS (ITU BS.1770).",
                     cost: "< 1 KB · 4 filters per sample", icon: "speaker.wave.2.bubble"),
+        FeatureInfo(id: "personal", title: "Hearing test & personal correction",
+                    summary: "A short tone test per ear builds a gentle correction for the frequencies you hear less well, applied separately to each ear.",
+                    cost: "< 1 KB · up to 16 filters per sample", icon: "waveform.and.person.filled"),
     ]
 
     /// Processing stages to run for these settings.
     public var processing: ProcessingConfig {
-        ProcessingConfig(surround: surround.enabled ? surround : nil, leveler: leveler.enabled ? leveler : nil)
+        ProcessingConfig(surround: surround.enabled ? surround : nil,
+                         leveler: leveler.enabled ? leveler : nil,
+                         // Only allocate the per-ear stage once there's a test result to apply.
+                         personal: personal.enabled && personal.audiogram != nil ? personal : nil)
     }
 
     /// Generic on/off access by feature id (used by the Features page).
@@ -54,6 +62,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "deviceMemory": return deviceMemory
         case "surround": return surround.enabled
         case "leveler": return leveler.enabled
+        case "personal": return personal.enabled
         default: return false
         }
     }
@@ -64,6 +73,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "deviceMemory": deviceMemory = on
         case "surround": surround.enabled = on
         case "leveler": leveler.enabled = on
+        case "personal": personal.enabled = on
         default: break
         }
     }

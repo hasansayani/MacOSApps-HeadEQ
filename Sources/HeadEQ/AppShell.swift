@@ -2,7 +2,7 @@ import EQCore
 import SwiftUI
 
 enum Page: String, CaseIterable, Identifiable {
-    case equalizer, output, spatial, loudness, system, hearing, background, expert, features
+    case equalizer, output, spatial, loudness, system, hearing, hearingTest, background, expert, features
     var id: String { rawValue }
 
     /// Sidebar grouping.
@@ -11,7 +11,7 @@ enum Page: String, CaseIterable, Identifiable {
     var group: Group {
         switch self {
         case .equalizer, .output, .spatial, .loudness: return .sound
-        case .hearing, .background: return .hearing
+        case .hearing, .hearingTest, .background: return .hearing
         case .expert: return .tools
         case .system, .features: return .app
         }
@@ -22,6 +22,7 @@ enum Page: String, CaseIterable, Identifiable {
         switch self {
         case .spatial: return "surround"
         case .loudness: return "leveler"
+        case .hearingTest: return "personal"
         default: return nil
         }
     }
@@ -34,6 +35,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .loudness: return "Loudness"
         case .system: return "System Audio"
         case .hearing: return "Hearing Protection"
+        case .hearingTest: return "Hearing Test"
         case .background: return "Background Sounds"
         case .expert: return "Expert"
         case .features: return "Features"
@@ -48,6 +50,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .loudness: return "speaker.wave.2.bubble"
         case .system: return "speaker.wave.2"
         case .hearing: return "ear"
+        case .hearingTest: return "waveform.and.person.filled"
         case .background: return "cloud.rain"
         case .expert: return "info.circle"
         case .features: return "switch.2"
@@ -62,6 +65,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .loudness: return "Volume levelling across tracks, apps and videos"
         case .system: return "Device volume, alerts, Headphone Accommodations and Transparency"
         case .hearing: return "Spike guard, level cap and today's sound dose"
+        case .hearingTest: return "Measure your hearing per ear and apply a personal correction"
         case .background: return "macOS Accessibility Background Sounds"
         case .expert: return "Where each tuning comes from, and the full signal chain"
         case .features: return "Turn optional features on or off. Off means no processing and no memory used."
@@ -138,6 +142,7 @@ struct ContentView: View {
         case .loudness: LoudnessPage()
         case .system: SystemAudioPage()
         case .hearing: HearingProtectionCard()
+        case .hearingTest: HearingTestPage()
         case .background: BackgroundSoundsCard()
         case .expert: ExpertView()
         case .features: FeaturesPage()
