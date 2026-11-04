@@ -7,6 +7,7 @@ struct HeadEQApp: App {
     @StateObject private var backgroundSounds = BackgroundSoundsModel()
     @StateObject private var systemAudio = SystemAudioModel()
     @StateObject private var sync = SyncService()
+    @StateObject private var updates = UpdateChecker()
     @AppStorage(Prefs.showMenuBarIcon) private var showMenuBarIcon = true
 
     var body: some Scene {
@@ -19,15 +20,24 @@ struct HeadEQApp: App {
                 .onAppear {
                     appDelegate.model = model
                     if model.settings.features.sync { sync.start(model: model) }
+                    if model.settings.features.autoUpdates { updates.start() }
+                    model.settings.features.launchAtLogin = LaunchAtLogin.isEnabled   // the system owns the truth
                 }
                 .onChange(of: model.settings.features.sync) { _, on in on ? sync.start(model: model) : sync.stop() }
+                .onChange(of: model.settings.features.autoUpdates) { _, on in on ? updates.start() : updates.stop() }
+                .onChange(of: model.settings.features.launchAtLogin) { _, on in
+                    if on != LaunchAtLogin.isEnabled, LaunchAtLogin.set(on) != nil {
+                        model.settings.features.launchAtLogin = LaunchAtLogin.isEnabled
+                    }
+                }
+                .environmentObject(updates)
         }
         .defaultSize(width: 1140, height: 800)
         .windowResizability(.contentMinSize)
         .commands { AppCommands() }
 
         Window("About HeadEQ", id: "about") {
-            AboutView()
+            AboutView().environmentObject(updates)
         }
         .windowResizability(.contentSize)
         .windowStyle(.hiddenTitleBar)
@@ -38,7 +48,7 @@ struct HeadEQApp: App {
         .defaultSize(width: 900, height: 620)
 
         Settings {
-            SettingsView()
+            SettingsView().environmentObject(model).environmentObject(updates)
         }
 
         MenuBarExtra(isInserted: $showMenuBarIcon) {
@@ -56,6 +66,7 @@ struct AppCommands: Commands {
     var body: some Commands {
         CommandGroup(replacing: .appInfo) {
             Button("About HeadEQ") { openWindow(id: "about") }
+            Button("Check for Updates…") { openWindow(id: "about") }
         }
         CommandGroup(replacing: .help) {
             Button("HeadEQ Help") { openWindow(id: "help") }.keyboardShortcut("?", modifiers: .command)

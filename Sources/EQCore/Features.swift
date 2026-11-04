@@ -15,6 +15,10 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
     public var compare = false
     /// Sync user presets & headphones through a folder (iCloud Drive by default).
     public var sync = false
+    /// Start HeadEQ when you log in (mirrors the system login item).
+    public var launchAtLogin = false
+    /// Check for new versions once a day.
+    public var autoUpdates = false
 
     public init() {}
 
@@ -29,6 +33,8 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         dac = c.value(.dac, d.dac)
         compare = c.value(.compare, d.compare)
         sync = c.value(.sync, d.sync)
+        launchAtLogin = c.value(.launchAtLogin, d.launchAtLogin)
+        autoUpdates = c.value(.autoUpdates, d.autoUpdates)
     }
 
     /// Catalogue of optional features, in display order.
@@ -57,6 +63,12 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         FeatureInfo(id: "sync", title: "Preset sync",
                     summary: "Keep your presets and headphone profiles in sync across Macs through iCloud Drive (or any synced folder such as Dropbox).",
                     cost: "Checks the sync file every 30 s while on", icon: "arrow.triangle.2.circlepath.icloud"),
+        FeatureInfo(id: "launchAtLogin", title: "Launch at login",
+                    summary: "Start HeadEQ automatically when you log in, so your EQ is always on.",
+                    cost: "No runtime cost", icon: "power"),
+        FeatureInfo(id: "autoUpdates", title: "Automatic update checks",
+                    summary: "Check once a day for a newer HeadEQ release and offer to download it.",
+                    cost: "One small web request per day", icon: "arrow.down.app"),
     ]
 
     /// Processing stages to run for these settings.
@@ -83,6 +95,8 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "dac": return dac.enabled
         case "compare": return compare
         case "sync": return sync
+        case "launchAtLogin": return launchAtLogin
+        case "autoUpdates": return autoUpdates
         default: return false
         }
     }
@@ -97,6 +111,8 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "dac": dac.enabled = on
         case "compare": compare = on
         case "sync": sync = on
+        case "launchAtLogin": launchAtLogin = on
+        case "autoUpdates": autoUpdates = on
         default: break
         }
     }

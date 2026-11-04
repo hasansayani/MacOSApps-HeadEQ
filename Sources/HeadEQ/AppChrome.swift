@@ -78,6 +78,8 @@ enum AppIcon {
 // MARK: - Settings window (⌘,)
 
 struct SettingsView: View {
+    @EnvironmentObject var model: EQModel
+    @EnvironmentObject var updates: UpdateChecker
     @AppStorage("themeID") private var themeID = "classic"
     @AppStorage(Prefs.appIconStyle) private var iconStyle = "classic"
     @AppStorage(Prefs.menuBarIcon) private var menuIcon = MenuBarIconStyle.glyph.rawValue
@@ -87,6 +89,25 @@ struct SettingsView: View {
 
     var body: some View {
         TabView {
+            Form {
+                Section("Startup") {
+                    Toggle("Launch HeadEQ at login", isOn: $model.settings.features.launchAtLogin)
+                }
+                Section("Updates") {
+                    Toggle("Check for updates automatically", isOn: $model.settings.features.autoUpdates)
+                    HStack {
+                        Button("Check now") { Task { await updates.check() } }
+                        Text(updates.status).font(.caption).foregroundStyle(.secondary)
+                    }
+                    if let u = updates.available {
+                        Button("Download HeadEQ \(u.version.description)") { updates.openDownload() }.buttonStyle(.borderedProminent)
+                    }
+                    Text(AppInfo.fullVersion).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            .formStyle(.grouped)
+            .tabItem { Label("General", systemImage: "gearshape") }
+
             Form {
                 Section("Theme") {
                     Picker("Color theme", selection: $themeID) {
@@ -168,6 +189,7 @@ struct MenuBarLabel: View {
 // MARK: - About
 
 struct AboutView: View {
+    @EnvironmentObject var updates: UpdateChecker
     @AppStorage("themeID") private var themeID = "classic"
 
     var body: some View {
@@ -177,6 +199,11 @@ struct AboutView: View {
             }
             Text(AppInfo.name).font(.title.bold())
             Text(AppInfo.fullVersion).font(.callout).foregroundStyle(.secondary).textSelection(.enabled)
+            HStack {
+                Button("Check for Updates") { Task { await updates.check() } }.controlSize(.small)
+                if let u = updates.available { Button("Get \(u.version.description)") { updates.openDownload() }.controlSize(.small) }
+            }
+            if !updates.status.isEmpty { Text(updates.status).font(.caption).foregroundStyle(.secondary) }
             Text("A system-wide equalizer tuned for your headphones — with measured headphone corrections, music presets, hearing protection and Background Sounds controls.")
                 .multilineTextAlignment(.center).font(.callout).fixedSize(horizontal: false, vertical: true)
             Divider()

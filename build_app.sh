@@ -44,6 +44,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleShortVersionString</key><string>${VERSION}</string>
   <key>CFBundleVersion</key><string>${BUILD}</string>
   <key>HEQGitCommit</key><string>${COMMIT}</string>
+  <key>HEQUpdateFeedURL</key><string>${UPDATE_FEED_URL:-}</string>
   <key>LSMinimumSystemVersion</key><string>14.2</string>
   <key>LSApplicationCategoryType</key><string>public.app-category.music</string>
   <key>NSHighResolutionCapable</key><true/>
