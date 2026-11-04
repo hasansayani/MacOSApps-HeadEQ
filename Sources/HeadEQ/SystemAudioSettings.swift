@@ -158,13 +158,13 @@ final class SystemSounds {
         guard AudioObjectHasProperty(id, &addr) else { return nil }
         var value: Float32 = 0
         var size = UInt32(MemoryLayout<Float32>.size)
-        return AudioHardwareServiceGetPropertyData(id, &addr, 0, nil, &size, &value) == noErr ? value : nil
+        return AudioObjectGetPropertyData(id, &addr, 0, nil, &size, &value) == noErr ? value : nil
     }
 
     private static func setFloat(_ id: AudioObjectID, _ selector: AudioObjectPropertySelector, _ value: Float32) {
         var addr = outputAddress(selector)
         var v = value
-        AudioHardwareServiceSetPropertyData(id, &addr, 0, nil, UInt32(MemoryLayout<Float32>.size), &v)
+        AudioObjectSetPropertyData(id, &addr, 0, nil, UInt32(MemoryLayout<Float32>.size), &v)
     }
 
     private static func getUInt32(_ id: AudioObjectID, _ selector: AudioObjectPropertySelector) -> UInt32? {

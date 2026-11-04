@@ -82,7 +82,7 @@ struct SystemAudioPage: View {
             }
             Button("Open Accessibility ▸ Audio…") { SystemBackgroundSounds.openSystemSettings() }.controlSize(.small)
         }
-        .onAppear { sysModel.startObserving { [weak model] in model?.activeDevice } }
+        .onAppear { sysModel.startObserving { [model] in model.activeDevice } }
         .onDisappear { sysModel.stopObserving() }
     }
 
