@@ -2,7 +2,7 @@ import EQCore
 import SwiftUI
 
 enum Page: String, CaseIterable, Identifiable {
-    case equalizer, output, spatial, loudness, dac, system, hearing, hearingTest, background, expert, features
+    case equalizer, output, spatial, loudness, dac, system, hearing, hearingTest, background, compare, expert, features
     var id: String { rawValue }
 
     /// Sidebar grouping.
@@ -12,7 +12,7 @@ enum Page: String, CaseIterable, Identifiable {
         switch self {
         case .equalizer, .output, .spatial, .loudness, .dac: return .sound
         case .hearing, .hearingTest, .background: return .hearing
-        case .expert: return .tools
+        case .compare, .expert: return .tools
         case .system, .features: return .app
         }
     }
@@ -24,6 +24,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .loudness: return "leveler"
         case .hearingTest: return "personal"
         case .dac: return "dac"
+        case .compare: return "compare"
         default: return nil
         }
     }
@@ -40,6 +41,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .hearingTest: return "Hearing Test"
         case .background: return "Background Sounds"
         case .expert: return "Expert"
+        case .compare: return "Compare"
         case .features: return "Features"
         }
     }
@@ -56,6 +58,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .hearingTest: return "waveform.and.person.filled"
         case .background: return "cloud.rain"
         case .expert: return "info.circle"
+        case .compare: return "arrow.left.arrow.right.square"
         case .features: return "switch.2"
         }
     }
@@ -72,6 +75,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .hearingTest: return "Measure your hearing per ear and apply a personal correction"
         case .background: return "macOS Accessibility Background Sounds"
         case .expert: return "Where each tuning comes from, and the full signal chain"
+        case .compare: return "A/B switching and blind preference tests"
         case .features: return "Turn optional features on or off. Off means no processing and no memory used."
         }
     }
@@ -150,6 +154,7 @@ struct ContentView: View {
         case .hearingTest: HearingTestPage()
         case .background: BackgroundSoundsCard()
         case .expert: ExpertView()
+        case .compare: ComparePage()
         case .features: FeaturesPage()
         }
     }

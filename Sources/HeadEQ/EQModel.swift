@@ -19,6 +19,11 @@ final class EQModel: ObservableObject {
     @Published private(set) var protectionReductionDB: Float = 0
     let library = HeadphoneLibrary()
 
+    // A/B comparison: two captured setups; `audition` plays one without changing saved settings.
+    @Published var abSlots: [ABSlot: SoundSnapshot] = [:]
+    @Published private(set) var audition: ABSlot?
+    @Published var levelMatch = true
+
     /// While the headphone editor is open, its draft is auditioned live.
     @Published var previewHeadphone: HeadphoneProfile? { didSet { pushDSP() } }
 
@@ -235,6 +240,7 @@ final class EQModel: ObservableObject {
         if settings.output != old.output { backend.update(output: settings.output) }
         if settings.features.measuredProfiles != old.features.measuredProfiles { pushDSP() }
         if settings.features.processing != old.features.processing { backend.update(processing: settings.features.processing) }
+        if !settings.features.compare, audition != nil { play(nil) }
         let oldHeadphone = headphoneProfiles.first { $0.id == old.headphoneProfileID } ?? .none
         if old.shouldBypass(headphone: oldHeadphone) != shouldBypass, settings.enabled == old.enabled,
            settings.outputDeviceUID == old.outputDeviceUID {
@@ -253,7 +259,38 @@ final class EQModel: ObservableObject {
     }
 
     private func pushDSP() {
-        backend.update(filters: filters, preampDB: effectivePreamp)
+        if let slot = audition, let snap = abSlots[slot] {
+            let eff = snap.applied(to: settings)
+            let hp = headphoneProfiles.first { $0.id == eff.headphoneProfileID } ?? .none
+            let f = eff.filters(headphone: hp)
+            backend.update(filters: f, preampDB: eff.effectivePreamp(filters: f) + levelOffset(for: slot))
+            backend.update(output: eff.output)
+        } else {
+            backend.update(filters: filters, preampDB: effectivePreamp)
+        }
+    }
+
+    // MARK: A/B
+
+    func capture(_ slot: ABSlot) {
+        abSlots[slot] = SoundSnapshot(deviceName: slot.rawValue, settings: settings)
+        if audition == slot { pushDSP() }
+    }
+
+    func play(_ slot: ABSlot?) {
+        audition = slot.flatMap { abSlots[$0] == nil ? nil : $0 }
+        pushDSP()
+        if audition == nil { backend.update(output: settings.output) }
+    }
+
+    /// Gain applied to `slot` so both slots have the same average loudness.
+    func levelOffset(for slot: ABSlot) -> Double {
+        guard levelMatch, let a = abSlots[.a], let b = abSlots[.b] else { return 0 }
+        func avg(_ s: SoundSnapshot) -> Double {
+            s.averageGainDB(headphone: headphoneProfiles.first { $0.id == s.headphoneProfileID } ?? .none, base: settings)
+        }
+        let target = min(avg(a), avg(b))       // match down, never boost into clipping
+        return target - avg(slot == .a ? a : b)
     }
 
     private var targetDevice: OutputDevice? {

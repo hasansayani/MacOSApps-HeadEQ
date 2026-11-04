@@ -11,6 +11,8 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
     public var leveler = LevelerSettings()
     public var personal = PersonalCorrectionSettings()
     public var dac = DACSettings()
+    /// A/B & blind comparison tools.
+    public var compare = false
 
     public init() {}
 
@@ -23,6 +25,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         leveler = c.value(.leveler, d.leveler)
         personal = c.value(.personal, d.personal)
         dac = c.value(.dac, d.dac)
+        compare = c.value(.compare, d.compare)
     }
 
     /// Catalogue of optional features, in display order.
@@ -45,6 +48,9 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         FeatureInfo(id: "dac", title: "DAC mode",
                     summary: "Bit-perfect bypass when nothing would change the sound, a remembered hardware sample rate per device, and the real device format.",
                     cost: "Saves CPU — bypass stops processing entirely", icon: "cable.connector"),
+        FeatureInfo(id: "compare", title: "A/B & blind comparison",
+                    summary: "Capture two setups and switch instantly with level matching, or run a blind preference test with a significance check.",
+                    cost: "No runtime cost", icon: "arrow.left.arrow.right.square"),
     ]
 
     /// Processing stages to run for these settings.
@@ -69,6 +75,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "leveler": return leveler.enabled
         case "personal": return personal.enabled
         case "dac": return dac.enabled
+        case "compare": return compare
         default: return false
         }
     }
@@ -81,6 +88,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "leveler": leveler.enabled = on
         case "personal": personal.enabled = on
         case "dac": dac.enabled = on
+        case "compare": compare = on
         default: break
         }
     }
