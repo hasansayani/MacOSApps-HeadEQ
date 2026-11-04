@@ -1,0 +1,57 @@
+{
+  "apps": [
+    {
+      "id": "macos",
+      "name": "HeadEQ",
+      "tagline": "System-wide headphone EQ for macOS",
+      "platform": "macos",
+      "serving": "1 Apple silicon app",
+      "app": "build/HeadEQ.app",
+      "build": ["./build_app.sh"],
+      "test": ["swift", "test"],
+      "coverage_dir": "EQCore",
+      "benchmark_env": "HEADEQ_BENCHMARK",
+      "benchmark_label": "DSP per 10 ms buffer (all on)",
+      "benchmark_detail": "({frames} frames, {filters} filters, {runs} runs)",
+      "bundle_process": "HeadEQ",
+      "code_targets": {
+        "Core logic (EQCore)": ["Sources/EQCore"],
+        "App": ["Sources/HeadEQ"],
+        "Icon art & tool": ["Sources/HeadEQArt", "Sources/make-icon"],
+        "Tests": ["Tests/EQCoreTests"]
+      },
+      "sources": ["Sources/EQCore", "Sources/HeadEQ", "Sources/HeadEQArt"],
+      "ui_layer": "manually tested",
+      "skipped_note": "{n} (needs AutoEQ index file)",
+      "private_api_groups": ["HearingUtilities", "PersonalAudio"],
+      "permissions": [
+        ["System audio recording", "Required (process tap)", true],
+        ["Microphone", "Not used", false],
+        ["Accessibility", "Not used", false],
+        ["Screen Recording (video)", "Not used", false],
+        ["Apple Events", "Alert volume only", false],
+        ["Notifications", "Not used", false]
+      ],
+      "privacy": [
+        ["Data collected / telemetry", "None"],
+        ["Audio recorded or uploaded", "Never"],
+        ["Files read", "Prefs, sync folder (if on)"],
+        ["Files written", "Prefs, AutoEQ cache, sync file"],
+        ["System settings changed", "Only when you change them"]
+      ],
+      "sandbox_note": "No (system-wide audio tap)",
+      "background": "Audio thread while on; 1 s meters",
+      "compatibility": [
+        ["Chips", "Apple silicon", false],
+        ["Outputs", "Any Core Audio device, incl. DACs", false],
+        ["Headphone data", "AutoEQ (~8,850 models)", false]
+      ],
+      "contains": "Captures all system audio through a Core Audio process tap and processes it on your Mac. Nothing is recorded or sent anywhere. Background Sounds and Headphone Accommodations controls use private macOS settings classes, which may change in future macOS versions.",
+      "footnotes": [
+        "Network: AutoEQ on GitHub when you use Add by Name; an update feed once a day only if you turn it on.",
+        "Idle figures sampled with the equalizer on and the audio tap running.",
+        "DSP benchmark: Sony WH-1000XM3 correction + Electronic preset, 48 kHz, release build."
+      ]
+    }
+  ]
+}

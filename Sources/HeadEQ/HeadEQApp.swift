@@ -10,6 +10,10 @@ struct HeadEQApp: App {
     @StateObject private var updates = UpdateChecker()
     @AppStorage(Prefs.showMenuBarIcon) private var showMenuBarIcon = true
 
+    init() {
+        DSPBenchmark.runIfRequested()   // exits when HEADEQ_BENCHMARK is set
+    }
+
     var body: some Scene {
         Window("HeadEQ", id: "main") {
             ContentView()

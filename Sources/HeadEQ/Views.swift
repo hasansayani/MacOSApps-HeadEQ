@@ -388,7 +388,7 @@ struct LimiterMeter: View {
     @EnvironmentObject var model: EQModel
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 15)) { _ in
+        TimelineView(.animation(minimumInterval: 1 / 4, paused: !model.isRunning || !model.settings.output.limiterEnabled)) { _ in
             let gr = model.isRunning && model.settings.output.limiterEnabled ? model.backend.limiterReductionDB : 0
             HStack(spacing: 4) {
                 Text("GR").font(.caption2).foregroundStyle(.secondary)
@@ -474,7 +474,7 @@ struct MenuBarView: View {
         Toggle("Mono", isOn: $model.settings.output.mono)
         Toggle("Hearing protection", isOn: $model.settings.hearing.enabled)
         BackgroundSoundsMenu()
-        Text("Today's sound dose: \(Int(model.exposure.dose * 100))%")
+        MenuDoseText(meters: model.meters)
         Divider()
         Button("Open HeadEQ…") {
             openWindow(id: "main")
@@ -486,4 +486,10 @@ struct MenuBarView: View {
         Divider()
         Button("Quit") { model.shutdown(); NSApp.terminate(nil) }.keyboardShortcut("q")
     }
+}
+
+
+private struct MenuDoseText: View {
+    @ObservedObject var meters: LiveMeters
+    var body: some View { Text("Today's sound dose: \(meters.dosePercent)%") }
 }

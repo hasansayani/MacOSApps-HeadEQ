@@ -1,8 +1,23 @@
 # HeadEQ
 
+System-wide equalizer for macOS that tunes everything your Mac plays to the headphones you're wearing.
+Every number on the label below is measured from the code and the built app (`scripts/app_facts.py`).
+
+<p align="center"><img src="docs/app-facts-macos.svg" alt="App Facts label for HeadEQ: download size, code, tests, permissions, CPU and memory use" width="388"></p>
+
 **Docs:** [User Guide](docs/UserGuide.md) · [Architecture & porting](docs/Architecture.md) · [Changelog](CHANGELOG.md) · current version in `VERSION`
 
 System-wide equalizer for macOS (14.2+), with headphone-correction profiles and music presets.
+
+## App Facts label
+
+```bash
+scripts/app_facts.py                 # build, test with coverage, benchmark, sample the running app, redraw
+scripts/app_facts.py --skip-runtime  # keep the previous CPU/memory/benchmark numbers
+scripts/app_facts.py --render-only   # redraw from docs/app-facts-macos.json
+```
+Writes `docs/app-facts-macos.svg` (the label), `.json` (raw measurements) and `.label.json` (drawing ops). Wording that
+can't be measured lives in `docs/app-facts.config.json`. Same format and generator as the other apps in this workspace.
 
 ## Build & run
 

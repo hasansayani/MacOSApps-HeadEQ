@@ -22,6 +22,11 @@ final class VisualizerEngine {
     private var lastDate = Date()
     private var lastWritten = 0
 
+    /// Something audible recently, or bars still falling.
+    func isActive(backend: AudioBackend) -> Bool {
+        backend.outputLevelDBFS > -75 || analyzer.levels.contains { $0 > 0.01 } || analyzer.peaks.contains { $0 > 0.01 }
+    }
+
     func tick(backend: AudioBackend, date: Date) {
         let dt = min(0.1, max(0.001, date.timeIntervalSince(lastDate)))
         lastDate = date
@@ -49,7 +54,17 @@ struct VisualizerView: View {
         if style == .off {
             Color.clear
         } else {
-            TimelineView(.animation(minimumInterval: 1 / 60)) { timeline in
+            // A slow outer clock decides whether there's anything to draw; the
+            // 30 fps animation clock stops entirely during silence.
+            TimelineView(.periodic(from: .now, by: 0.5)) { _ in
+                animated(paused: !engine.isActive(backend: backend))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func animated(paused: Bool) -> some View {
+        TimelineView(.animation(minimumInterval: 1 / 30, paused: paused)) { timeline in
                 Canvas { ctx, size in
                     engine.tick(backend: backend, date: timeline.date)
                     let shading = GraphicsContext.Shading.linearGradient(
@@ -64,7 +79,6 @@ struct VisualizerView: View {
                     }
                 }
             }
-        }
     }
 
     private func drawBars(_ ctx: GraphicsContext, _ size: CGSize, _ shading: GraphicsContext.Shading) {

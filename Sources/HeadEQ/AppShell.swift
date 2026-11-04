@@ -281,7 +281,7 @@ struct SidebarStatus: View {
             Divider()
             row("headphones", model.headphoneProfile.name)
             row("music.note", model.currentMusicPreset?.name ?? "Custom")
-            row("ear", "Dose today \(Int(model.exposure.dose * 100))%")
+            DoseLabel(meters: model.meters)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -395,5 +395,13 @@ struct Section2<Content: View>: View {
         } label: {
             Label(title, systemImage: icon).font(.headline)
         }
+    }
+}
+
+
+private struct DoseLabel: View {
+    @ObservedObject var meters: LiveMeters
+    var body: some View {
+        Label("Dose today \(meters.dosePercent)%", systemImage: "ear").font(.caption).foregroundStyle(.secondary).lineLimit(1)
     }
 }

@@ -1,0 +1,534 @@
+{
+ "id": "macos",
+ "ops": [
+  {
+   "op": "title",
+   "text": "App Facts"
+  },
+  {
+   "op": "text",
+   "dy": 16,
+   "left": "HeadEQ 0.6.0 · System-wide headphone EQ for macOS",
+   "size": 13,
+   "weight": 400
+  },
+  {
+   "op": "text",
+   "dy": 18,
+   "left": "Serving size",
+   "right": "1 Apple silicon app",
+   "size": 15,
+   "weight": 800
+  },
+  {
+   "op": "gap",
+   "h": 6
+  },
+  {
+   "op": "bar",
+   "h": 10
+  },
+  {
+   "op": "small",
+   "text": "Amount per download"
+  },
+  {
+   "op": "big",
+   "left": "Download",
+   "right": "2.1 MB"
+  },
+  {
+   "op": "gap",
+   "h": 6
+  },
+  {
+   "op": "bar",
+   "h": 5
+  },
+  {
+   "op": "row",
+   "name": "Installed size",
+   "value": "5.4 MB",
+   "bold": true,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Apple silicon slice",
+   "value": "4.3 MB",
+   "bold": false,
+   "indent": 14,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Third-party dependencies",
+   "value": "0",
+   "bold": true,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Private APIs",
+   "value": "4 (from 2 frameworks)",
+   "bold": true,
+   "indent": 0,
+   "line": false
+  },
+  {
+   "op": "gap",
+   "h": 3
+  },
+  {
+   "op": "bar",
+   "h": 10
+  },
+  {
+   "op": "heading",
+   "name": "Code",
+   "right": "67 files"
+  },
+  {
+   "op": "row",
+   "name": "Lines of code",
+   "value": "7,279",
+   "bold": true,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Core logic (EQCore)",
+   "value": "2,060",
+   "bold": false,
+   "indent": 14,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "App",
+   "value": "4,338",
+   "bold": false,
+   "indent": 14,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Icon art & tool",
+   "value": "95",
+   "bold": false,
+   "indent": 14,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Tests",
+   "value": "786",
+   "bold": false,
+   "indent": 14,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Comment lines",
+   "value": "416  (5% of code)",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Language",
+   "value": "Swift (no Objective-C)",
+   "bold": false,
+   "indent": 0,
+   "line": false
+  },
+  {
+   "op": "gap",
+   "h": 3
+  },
+  {
+   "op": "bar",
+   "h": 5
+  },
+  {
+   "op": "heading",
+   "name": "Tests",
+   "right": ""
+  },
+  {
+   "op": "row",
+   "name": "Tests passing",
+   "value": "82/82  (100%)",
+   "bold": true,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Test suites",
+   "value": "18",
+   "bold": false,
+   "indent": 14,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Skipped here",
+   "value": "1 (needs AutoEQ index file)",
+   "bold": false,
+   "indent": 14,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Core logic line coverage",
+   "value": "90.3%",
+   "bold": true,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Core function coverage",
+   "value": "83.5%",
+   "bold": false,
+   "indent": 14,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "App / UI layer",
+   "value": "manually tested",
+   "bold": false,
+   "indent": 0,
+   "line": false
+  },
+  {
+   "op": "gap",
+   "h": 3
+  },
+  {
+   "op": "bar",
+   "h": 5
+  },
+  {
+   "op": "heading",
+   "name": "Permissions & Privacy",
+   "right": ""
+  },
+  {
+   "op": "row",
+   "name": "System audio recording",
+   "value": "Required (process tap)",
+   "bold": true,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Microphone",
+   "value": "Not used",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Accessibility",
+   "value": "Not used",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Screen Recording (video)",
+   "value": "Not used",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Apple Events",
+   "value": "Alert volume only",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Notifications",
+   "value": "Not used",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Network access",
+   "value": "Internet (3 call sites)",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Data collected / telemetry",
+   "value": "None",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Audio recorded or uploaded",
+   "value": "Never",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Files read",
+   "value": "Prefs, sync folder (if on)",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Files written",
+   "value": "Prefs, AutoEQ cache, sync file",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "System settings changed",
+   "value": "Only when you change them",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Entitlements",
+   "value": "0",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "App Sandbox",
+   "value": "No (system-wide audio tap)",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Hardened runtime",
+   "value": "No",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Code signature",
+   "value": "Ad-hoc",
+   "bold": false,
+   "indent": 0,
+   "line": false
+  },
+  {
+   "op": "gap",
+   "h": 3
+  },
+  {
+   "op": "bar",
+   "h": 5
+  },
+  {
+   "op": "heading",
+   "name": "Performance",
+   "right": "measured"
+  },
+  {
+   "op": "row",
+   "name": "CPU while idle",
+   "value": "3.00%",
+   "bold": true,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Memory while idle",
+   "value": "113 MB",
+   "bold": true,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Threads while idle",
+   "value": "7",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "DSP per 10 ms buffer (all on)",
+   "value": "0.038 ms median",
+   "bold": true,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "(480 frames, 20 filters, 2000 runs)",
+   "value": "0.043 ms p95",
+   "bold": false,
+   "indent": 14,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Base chain (optional features off)",
+   "value": "0.024 ms median",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Real-time load, everything on",
+   "value": "0.38% of one core",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Background work",
+   "value": "Audio thread while on; 1 s meters",
+   "bold": false,
+   "indent": 0,
+   "line": false
+  },
+  {
+   "op": "gap",
+   "h": 3
+  },
+  {
+   "op": "bar",
+   "h": 5
+  },
+  {
+   "op": "heading",
+   "name": "Compatibility",
+   "right": ""
+  },
+  {
+   "op": "row",
+   "name": "macOS",
+   "value": "14.2 Sonoma or later",
+   "bold": true,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Chips",
+   "value": "Apple silicon",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Outputs",
+   "value": "Any Core Audio device, incl. DACs",
+   "bold": false,
+   "indent": 0,
+   "line": true
+  },
+  {
+   "op": "row",
+   "name": "Headphone data",
+   "value": "AutoEQ (~8,850 models)",
+   "bold": false,
+   "indent": 0,
+   "line": false
+  },
+  {
+   "op": "gap",
+   "h": 3
+  },
+  {
+   "op": "bar",
+   "h": 10
+  },
+  {
+   "op": "gap",
+   "h": 2
+  },
+  {
+   "op": "para",
+   "text": "INGREDIENTS: Swift, AVFoundation, AppKit, AudioToolbox, CoreAudio, CoreGraphics, Darwin, ImageIO, ObjectiveC, ServiceManagement, SwiftUI, UniformTypeIdentifiers, os.",
+   "size": 10.5,
+   "bold_prefix": "INGREDIENTS:"
+  },
+  {
+   "op": "gap",
+   "h": 4
+  },
+  {
+   "op": "para",
+   "text": "CONTAINS: 4 private API symbols from HearingUtilities, PersonalAudio. Captures all system audio through a Core Audio process tap and processes it on your Mac. Nothing is recorded or sent anywhere. Background Sounds and Headphone Accommodations controls use private macOS settings classes, which may change in future macOS versions.",
+   "size": 10.5,
+   "bold_prefix": "CONTAINS:"
+  },
+  {
+   "op": "gap",
+   "h": 6
+  },
+  {
+   "op": "para",
+   "text": "Network: AutoEQ on GitHub when you use Add by Name; an update feed once a day only if you turn it on.",
+   "size": 9.5,
+   "bold_prefix": null
+  },
+  {
+   "op": "para",
+   "text": "Idle figures sampled with the equalizer on and the audio tap running.",
+   "size": 9.5,
+   "bold_prefix": null
+  },
+  {
+   "op": "para",
+   "text": "DSP benchmark: Sony WH-1000XM3 correction + Electronic preset, 48 kHz, release build.",
+   "size": 9.5,
+   "bold_prefix": null
+  },
+  {
+   "op": "gap",
+   "h": 2
+  },
+  {
+   "op": "para",
+   "text": "Measured 2026-11-04 on Apple M5, macOS 27.0.1.",
+   "size": 9.5,
+   "bold_prefix": null
+  }
+ ]
+}

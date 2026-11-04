@@ -13,10 +13,15 @@ final class EQModel: ObservableObject {
     @Published private(set) var customPresets: [MusicPreset] = []
     @Published private(set) var customHeadphones: [HeadphoneProfile] = []
     @Published private(set) var lastGenerated: GeneratedPreset?
-    @Published private(set) var exposure = ExposureMeter(day: EQModel.today())
-    @Published private(set) var estimatedSPL: Double?
-    @Published private(set) var deviceVolumeDB: Double?
-    @Published private(set) var protectionReductionDB: Float = 0
+    /// Live readings live in their own object so their once-a-second updates only
+    /// refresh the few views that show them, not the whole window.
+    let meters = LiveMeters()
+    private(set) var exposure = ExposureMeter(day: EQModel.today()) {
+        didSet { meters.publish(exposure: exposure) }
+    }
+    private(set) var estimatedSPL: Double? { didSet { meters.publish(spl: estimatedSPL) } }
+    private(set) var deviceVolumeDB: Double? { didSet { meters.publish(volume: deviceVolumeDB) } }
+    private(set) var protectionReductionDB: Float = 0 { didSet { meters.publish(protection: protectionReductionDB) } }
     let library = HeadphoneLibrary()
 
     // A/B comparison: two captured setups; `audition` plays one without changing saved settings.
@@ -56,6 +61,7 @@ final class EQModel: ObservableObject {
         if let saved = Self.load(ExposureMeter.self, key: Self.exposureKey), saved.day == Self.today() {
             exposure = saved
         }
+        meters.publish(exposure: exposure)
         backend.onDevicesChanged = { [weak self] in
             Task { @MainActor in self?.refreshDevices() }
         }
@@ -363,10 +369,6 @@ final class EQModel: ObservableObject {
 
     // MARK: Hearing protection
 
-    var doseLevel: DoseLevel {
-        exposure.dose >= 1 ? .over : exposure.dose >= 0.8 ? .high : .ok
-    }
-    enum DoseLevel { case ok, high, over }
 
     func resetExposure() {
         exposure = ExposureMeter(day: Self.today())
@@ -489,5 +491,38 @@ final class EQModel: ObservableObject {
     func shutdown() {
         persistExposure()
         backend.stop()
+    }
+}
+
+
+/// Once-a-second readings, published only when a displayed value changes.
+@MainActor
+final class LiveMeters: ObservableObject {
+    enum DoseLevel { case ok, high, over }
+
+    @Published private(set) var exposure = ExposureMeter(day: 0)
+    @Published private(set) var estimatedSPL: Double?
+    @Published private(set) var deviceVolumeDB: Double?
+    @Published private(set) var protectionReductionDB: Float = 0
+
+    var doseLevel: DoseLevel { exposure.dose >= 1 ? .over : exposure.dose >= 0.8 ? .high : .ok }
+    var dosePercent: Int { Int((exposure.dose * 100).rounded()) }
+
+    func publish(exposure e: ExposureMeter) {
+        // Shown as a whole percentage and whole minutes: skip updates that wouldn't change the text.
+        if e.day != exposure.day || abs(e.dose - exposure.dose) >= 0.005
+            || Int(e.listeningSeconds / 60) != Int(exposure.listeningSeconds / 60) { exposure = e }
+    }
+
+    func publish(spl: Double?) {
+        if spl.map({ $0.rounded() }) != estimatedSPL.map({ $0.rounded() }) { estimatedSPL = spl }
+    }
+
+    func publish(volume: Double?) {
+        if volume.map({ $0.rounded() }) != deviceVolumeDB.map({ $0.rounded() }) { deviceVolumeDB = volume }
+    }
+
+    func publish(protection: Float) {
+        if (protection * 2).rounded() != (protectionReductionDB * 2).rounded() { protectionReductionDB = protection }
     }
 }

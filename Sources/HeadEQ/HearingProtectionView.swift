@@ -5,6 +5,13 @@ struct HearingProtectionCard: View {
     @EnvironmentObject var model: EQModel
     @Environment(\.theme) private var theme
 
+    var body: some View { Inner(meters: model.meters) }
+
+    private struct Inner: View {
+    @EnvironmentObject var model: EQModel
+    @ObservedObject var meters: LiveMeters
+    @Environment(\.theme) private var theme
+
     var body: some View {
         let h = $model.settings.hearing
         let hs = model.settings.hearing
@@ -39,25 +46,25 @@ struct HearingProtectionCard: View {
         } right: {
             Section2(title: "Right now", icon: "gauge.with.dots.needle.50percent") {
                 HStack(alignment: .top, spacing: 32) {
-                    stat(model.estimatedSPL.map { "\(Int($0.rounded())) dB" } ?? "—", "estimated level",
-                         color: levelColor(model.estimatedSPL ?? 0))
-                    stat(model.protectionReductionDB < -0.5 ? String(format: "%.1f dB", model.protectionReductionDB) : "Idle",
+                    stat(meters.estimatedSPL.map { "\(Int($0.rounded())) dB" } ?? "—", "estimated level",
+                         color: levelColor(meters.estimatedSPL ?? 0))
+                    stat(meters.protectionReductionDB < -0.5 ? String(format: "%.1f dB", meters.protectionReductionDB) : "Idle",
                          "protection gain reduction")
                 }
-                Text("Device volume: \(model.deviceVolumeDB.map { String(format: "%.0f dB", $0) } ?? "n/a")")
+                Text("Device volume: \(meters.deviceVolumeDB.map { String(format: "%.0f dB", $0) } ?? "n/a")")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section2(title: "Today's sound dose", icon: "calendar.badge.clock") {
-                ProgressView(value: min(model.exposure.dose, 1))
-                    .tint(model.doseLevel == .ok ? theme.accent : model.doseLevel == .high ? .orange : .red)
+                ProgressView(value: min(meters.exposure.dose, 1))
+                    .tint(meters.doseLevel == .ok ? theme.accent : meters.doseLevel == .high ? .orange : .red)
                 HStack {
-                    Text("\(Int((model.exposure.dose * 100).rounded()))% of daily safe limit")
+                    Text("\(Int((meters.exposure.dose * 100).rounded()))% of daily safe limit")
                         .font(.title3.bold()).monospacedDigit()
                     Spacer()
                     Button("Reset") { model.resetExposure() }.controlSize(.small)
                 }
-                Text("Listened \(duration(model.exposure.listeningSeconds))").font(.callout)
-                if let spl = model.estimatedSPL, let left = model.exposure.remainingSeconds(atSPL: spl) {
+                Text("Listened \(duration(meters.exposure.listeningSeconds))").font(.callout)
+                if let spl = meters.estimatedSPL, let left = meters.exposure.remainingSeconds(atSPL: spl) {
                     Text("≈ \(duration(left)) left at the current level").font(.callout).foregroundStyle(.secondary)
                 }
                 Divider()
@@ -87,20 +94,27 @@ struct HearingProtectionCard: View {
         let m = Int(seconds / 60)
         return m >= 60 ? "\(m / 60) h \(m % 60) min" : "\(m) min"
     }
+    }
 }
 
 /// Banner shown at the top of the window when today's dose is high.
 struct DoseBanner: View {
     @EnvironmentObject var model: EQModel
 
+    var body: some View { Inner(meters: model.meters) }
+
+    private struct Inner: View {
+    @EnvironmentObject var model: EQModel
+    @ObservedObject var meters: LiveMeters
+
     var body: some View {
-        if model.settings.hearing.enabled, model.settings.hearing.doseWarnings, model.doseLevel != .ok {
-            let over = model.doseLevel == .over
+        if model.settings.hearing.enabled, model.settings.hearing.doseWarnings, meters.doseLevel != .ok {
+            let over = meters.doseLevel == .over
             HStack(spacing: 10) {
                 Image(systemName: over ? "ear.trianglebadge.exclamationmark" : "ear.badge.waveform")
                 Text(over
                      ? "You've reached today's safe listening dose\(model.settings.hearing.overDoseCapReductionDB > 0 ? " — max level lowered by \(Int(model.settings.hearing.overDoseCapReductionDB)) dB" : ""). Consider a break or lower volume."
-                     : "You've used \(Int(model.exposure.dose * 100))% of today's safe listening dose.")
+                     : "You've used \(Int(meters.exposure.dose * 100))% of today's safe listening dose.")
                     .font(.callout)
                 Spacer()
             }
@@ -108,4 +122,5 @@ struct DoseBanner: View {
             .background(RoundedRectangle(cornerRadius: 8).fill((over ? Color.red : Color.orange).opacity(0.18)))
         }
     }
+}
 }

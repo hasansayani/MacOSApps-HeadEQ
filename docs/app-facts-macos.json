@@ -1,0 +1,106 @@
+{
+  "version": "0.6.0",
+  "min_os": "14.2",
+  "tests": {
+    "passed": 82,
+    "failed": 0,
+    "skipped": 1,
+    "suites": 18
+  },
+  "coverage": {
+    "lines_pct": 90.3,
+    "functions_pct": 83.5
+  },
+  "size": {
+    "app_bytes": 5641186,
+    "slices": {
+      "arm64": 4521232
+    },
+    "download_bytes": 2241019
+  },
+  "signing": {
+    "signature": "Ad-hoc",
+    "hardened_runtime": false,
+    "entitlements": 0,
+    "sandbox": false
+  },
+  "runtime": {
+    "benchmark": {
+      "extra": [
+        [
+          "Base chain (optional features off)",
+          "0.024 ms median"
+        ],
+        [
+          "Real-time load, everything on",
+          "0.38% of one core"
+        ]
+      ],
+      "filters": 20,
+      "frames": 480,
+      "median_ms": 0.038,
+      "p95_ms": 0.043,
+      "runs": 2000
+    },
+    "idle_cpu_pct": 3.0,
+    "idle_memory_mb": 113.4,
+    "threads": 7
+  },
+  "date": "2026-11-04",
+  "machine": "Apple M5, macOS 27.0.1",
+  "code": {
+    "Core logic (EQCore)": {
+      "files": 25,
+      "code": 2060,
+      "comments": 251,
+      "blank": 265
+    },
+    "App": {
+      "files": 28,
+      "code": 4338,
+      "comments": 132,
+      "blank": 451
+    },
+    "Icon art & tool": {
+      "files": 2,
+      "code": 95,
+      "comments": 13,
+      "blank": 13
+    },
+    "Tests": {
+      "files": 12,
+      "code": 786,
+      "comments": 20,
+      "blank": 99
+    }
+  },
+  "security": {
+    "frameworks": [
+      "AVFoundation",
+      "AppKit",
+      "AudioToolbox",
+      "CoreAudio",
+      "CoreGraphics",
+      "Darwin",
+      "ImageIO",
+      "ObjectiveC",
+      "ServiceManagement",
+      "SwiftUI",
+      "UniformTypeIdentifiers",
+      "os"
+    ],
+    "private_apis": [
+      "HUComfortSound",
+      "HUComfortSoundsFilterPoint",
+      "HUComfortSoundsSettings",
+      "PASettings"
+    ],
+    "private_frameworks": [
+      "HearingUtilities",
+      "PersonalAudio"
+    ],
+    "dependencies": 0,
+    "internet_call_sites": 3,
+    "local_network": false
+  }
+}
