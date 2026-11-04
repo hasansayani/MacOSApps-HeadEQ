@@ -2,7 +2,7 @@ import EQCore
 import SwiftUI
 
 enum Page: String, CaseIterable, Identifiable {
-    case equalizer, output, spatial, loudness, system, hearing, hearingTest, background, expert, features
+    case equalizer, output, spatial, loudness, dac, system, hearing, hearingTest, background, expert, features
     var id: String { rawValue }
 
     /// Sidebar grouping.
@@ -10,7 +10,7 @@ enum Page: String, CaseIterable, Identifiable {
 
     var group: Group {
         switch self {
-        case .equalizer, .output, .spatial, .loudness: return .sound
+        case .equalizer, .output, .spatial, .loudness, .dac: return .sound
         case .hearing, .hearingTest, .background: return .hearing
         case .expert: return .tools
         case .system, .features: return .app
@@ -23,6 +23,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .spatial: return "surround"
         case .loudness: return "leveler"
         case .hearingTest: return "personal"
+        case .dac: return "dac"
         default: return nil
         }
     }
@@ -33,6 +34,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .output: return "Output"
         case .spatial: return "Spatial"
         case .loudness: return "Loudness"
+        case .dac: return "DAC Mode"
         case .system: return "System Audio"
         case .hearing: return "Hearing Protection"
         case .hearingTest: return "Hearing Test"
@@ -48,6 +50,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .output: return "dial.medium"
         case .spatial: return "person.wave.2"
         case .loudness: return "speaker.wave.2.bubble"
+        case .dac: return "cable.connector"
         case .system: return "speaker.wave.2"
         case .hearing: return "ear"
         case .hearingTest: return "waveform.and.person.filled"
@@ -63,6 +66,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .output: return "Gain, stereo, crossfeed, limiter and device"
         case .spatial: return "Virtual speakers for headphones"
         case .loudness: return "Volume levelling across tracks, apps and videos"
+        case .dac: return "Bit-perfect bypass, device sample rate and hardware format"
         case .system: return "Device volume, alerts, Headphone Accommodations and Transparency"
         case .hearing: return "Spike guard, level cap and today's sound dose"
         case .hearingTest: return "Measure your hearing per ear and apply a personal correction"
@@ -140,6 +144,7 @@ struct ContentView: View {
         case .output: OutputCard()
         case .spatial: SpatialPage()
         case .loudness: LoudnessPage()
+        case .dac: DACPage()
         case .system: SystemAudioPage()
         case .hearing: HearingProtectionCard()
         case .hearingTest: HearingTestPage()
@@ -269,6 +274,7 @@ struct SidebarStatus: View {
     private var icon: String {
         switch model.status {
         case .running: return "waveform"
+        case .bypassed: return "checkmark.seal"
         case .stopped: return "pause.circle"
         case .failed: return "exclamationmark.triangle"
         }
@@ -277,6 +283,7 @@ struct SidebarStatus: View {
     private var color: Color {
         switch model.status {
         case .running: return .green
+        case .bypassed: return .teal
         case .stopped: return .secondary
         case .failed: return .orange
         }

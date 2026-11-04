@@ -72,11 +72,23 @@ final class EQModel: ObservableObject {
     var effectivePreamp: Double { settings.effectivePreamp(filters: filters) }
 
     var isRunning: Bool { if case .running = status { return true } else { return false } }
+    var isBypassed: Bool { if case .bypassed = status { return true } else { return false } }
+    var shouldBypass: Bool { settings.shouldBypass(headphone: headphoneProfile) }
+    var nonNeutralReasons: [String] { settings.nonNeutralReasons(headphone: headphoneProfile) }
+
+    func physicalFormat() -> PhysicalFormat? { activeDevice.flatMap { backend.physicalFormat(for: $0) } }
+
+    func setPreferredRate(_ rate: Double?) {
+        guard let d = activeDevice else { return }
+        settings.features.dac.preferredRates[d.uid] = rate
+        if let rate, settings.features.dac.applyPreferredRate, abs(currentSampleRate - rate) > 1 { setSampleRate(rate) }
+    }
 
     var statusText: String {
         switch status {
         case .stopped: return settings.enabled ? "Starting…" : "Bypassed — audio untouched"
         case .running(let name, let rate): return "Active on \(name) · " + String(format: "%.1f kHz", rate / 1000)
+        case .bypassed(let name): return "Bit-perfect on \(name) — nothing to process"
         case .failed(let message): return message
         }
     }
@@ -223,6 +235,12 @@ final class EQModel: ObservableObject {
         if settings.output != old.output { backend.update(output: settings.output) }
         if settings.features.measuredProfiles != old.features.measuredProfiles { pushDSP() }
         if settings.features.processing != old.features.processing { backend.update(processing: settings.features.processing) }
+        let oldHeadphone = headphoneProfiles.first { $0.id == old.headphoneProfileID } ?? .none
+        if old.shouldBypass(headphone: oldHeadphone) != shouldBypass, settings.enabled == old.enabled,
+           settings.outputDeviceUID == old.outputDeviceUID {
+            refreshDevices(forceRestart: !shouldBypass)
+            return
+        }
         if settings.hearing != old.hearing { pushHearing(force: true) }
 
         if settings.enabled != old.enabled || settings.outputDeviceUID != old.outputDeviceUID
@@ -270,6 +288,16 @@ final class EQModel: ObservableObject {
 
         guard settings.enabled else {
             backend.stop(); activeDevice = target; status = .stopped
+            return
+        }
+
+        // DAC mode: remembered hardware rate, and bit-perfect bypass when neutral.
+        if settings.features.dac.enabled, settings.features.dac.applyPreferredRate,
+           let rate = settings.features.dac.preferredRates[target.uid], abs(target.sampleRate - rate) > 1 {
+            try? backend.setSampleRate(rate, for: target)
+        }
+        if shouldBypass {
+            backend.stop(); activeDevice = target; status = .bypassed(deviceName: target.name)
             return
         }
         if !forceRestart, isRunning, activeDevice?.uid == target.uid { pushDSP(); return }

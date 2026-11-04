@@ -156,6 +156,14 @@ final class TapBackend: AudioBackend {
         return rates.sorted()
     }
 
+    func physicalFormat(for device: OutputDevice) -> PhysicalFormat? {
+        guard let id = CA.deviceID(forUID: device.uid),
+              let stream = CA.objectIDs(id, kAudioDevicePropertyStreams, scope: kAudioObjectPropertyScopeOutput).first,
+              let f = try? CA.get(stream, kAudioStreamPropertyPhysicalFormat, initial: AudioStreamBasicDescription()) else { return nil }
+        return PhysicalFormat(sampleRate: f.mSampleRate, bitsPerChannel: Int(f.mBitsPerChannel), channels: Int(f.mChannelsPerFrame),
+                              isFloat: f.mFormatFlags & kAudioFormatFlagIsFloat != 0)
+    }
+
     func setSampleRate(_ rate: Double, for device: OutputDevice) throws {
         guard let id = CA.deviceID(forUID: device.uid) else { throw CoreAudioError(status: -1, what: "Find device") }
         var addr = address(kAudioDevicePropertyNominalSampleRate)

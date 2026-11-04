@@ -10,6 +10,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
     public var surround = SurroundSettings()
     public var leveler = LevelerSettings()
     public var personal = PersonalCorrectionSettings()
+    public var dac = DACSettings()
 
     public init() {}
 
@@ -21,6 +22,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         surround = c.value(.surround, d.surround)
         leveler = c.value(.leveler, d.leveler)
         personal = c.value(.personal, d.personal)
+        dac = c.value(.dac, d.dac)
     }
 
     /// Catalogue of optional features, in display order.
@@ -40,6 +42,9 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         FeatureInfo(id: "personal", title: "Hearing test & personal correction",
                     summary: "A short tone test per ear builds a gentle correction for the frequencies you hear less well, applied separately to each ear.",
                     cost: "< 1 KB · up to 16 filters per sample", icon: "waveform.and.person.filled"),
+        FeatureInfo(id: "dac", title: "DAC mode",
+                    summary: "Bit-perfect bypass when nothing would change the sound, a remembered hardware sample rate per device, and the real device format.",
+                    cost: "Saves CPU — bypass stops processing entirely", icon: "cable.connector"),
     ]
 
     /// Processing stages to run for these settings.
@@ -63,6 +68,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "surround": return surround.enabled
         case "leveler": return leveler.enabled
         case "personal": return personal.enabled
+        case "dac": return dac.enabled
         default: return false
         }
     }
@@ -74,6 +80,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "surround": surround.enabled = on
         case "leveler": leveler.enabled = on
         case "personal": personal.enabled = on
+        case "dac": dac.enabled = on
         default: break
         }
     }

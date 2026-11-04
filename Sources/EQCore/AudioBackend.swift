@@ -36,6 +36,8 @@ public struct OutputDevice: Identifiable, Hashable, Sendable {
 public enum BackendStatus: Equatable, Sendable {
     case stopped
     case running(deviceName: String, sampleRate: Double)
+    /// DAC mode: nothing would change the sound, so audio goes straight to the device.
+    case bypassed(deviceName: String)
     case failed(String)
 }
 
@@ -52,6 +54,8 @@ public protocol AudioBackend: AnyObject {
     /// Hardware sample rates the device supports, and switching between them.
     func availableSampleRates(for device: OutputDevice) -> [Double]
     func setSampleRate(_ rate: Double, for device: OutputDevice) throws
+    /// The device's current physical (hardware) stream format.
+    func physicalFormat(for device: OutputDevice) -> PhysicalFormat?
     /// Newest processed output samples (mono mix) for visualizers.
     var visualizerRing: SampleRing { get }
     /// Current limiter gain reduction in dB (≤ 0), for metering.
