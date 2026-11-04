@@ -6,6 +6,7 @@ struct HeadEQApp: App {
     @StateObject private var model = EQModel()
     @StateObject private var backgroundSounds = BackgroundSoundsModel()
     @StateObject private var systemAudio = SystemAudioModel()
+    @StateObject private var sync = SyncService()
     @AppStorage(Prefs.showMenuBarIcon) private var showMenuBarIcon = true
 
     var body: some Scene {
@@ -14,7 +15,12 @@ struct HeadEQApp: App {
                 .environmentObject(model)
                 .environmentObject(backgroundSounds)
                 .environmentObject(systemAudio)
-                .onAppear { appDelegate.model = model }
+                .environmentObject(sync)
+                .onAppear {
+                    appDelegate.model = model
+                    if model.settings.features.sync { sync.start(model: model) }
+                }
+                .onChange(of: model.settings.features.sync) { _, on in on ? sync.start(model: model) : sync.stop() }
         }
         .defaultSize(width: 1140, height: 800)
         .windowResizability(.contentMinSize)

@@ -13,6 +13,8 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
     public var dac = DACSettings()
     /// A/B & blind comparison tools.
     public var compare = false
+    /// Sync user presets & headphones through a folder (iCloud Drive by default).
+    public var sync = false
 
     public init() {}
 
@@ -26,6 +28,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         personal = c.value(.personal, d.personal)
         dac = c.value(.dac, d.dac)
         compare = c.value(.compare, d.compare)
+        sync = c.value(.sync, d.sync)
     }
 
     /// Catalogue of optional features, in display order.
@@ -51,6 +54,9 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         FeatureInfo(id: "compare", title: "A/B & blind comparison",
                     summary: "Capture two setups and switch instantly with level matching, or run a blind preference test with a significance check.",
                     cost: "No runtime cost", icon: "arrow.left.arrow.right.square"),
+        FeatureInfo(id: "sync", title: "Preset sync",
+                    summary: "Keep your presets and headphone profiles in sync across Macs through iCloud Drive (or any synced folder such as Dropbox).",
+                    cost: "Checks the sync file every 30 s while on", icon: "arrow.triangle.2.circlepath.icloud"),
     ]
 
     /// Processing stages to run for these settings.
@@ -76,6 +82,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "personal": return personal.enabled
         case "dac": return dac.enabled
         case "compare": return compare
+        case "sync": return sync
         default: return false
         }
     }
@@ -89,6 +96,7 @@ public struct FeatureSettings: Codable, Equatable, Sendable {
         case "personal": personal.enabled = on
         case "dac": dac.enabled = on
         case "compare": compare = on
+        case "sync": sync = on
         default: break
         }
     }

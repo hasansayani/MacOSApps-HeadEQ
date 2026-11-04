@@ -431,13 +431,55 @@ final class EQModel: ObservableObject {
 
     private func persistCustomPresets() {
         if let data = try? JSONEncoder().encode(customPresets) { defaults.set(data, forKey: Self.customPresetsKey) }
+        onLibraryChanged?()
     }
 
     private func persistCustomHeadphones() {
         if let data = try? JSONEncoder().encode(customHeadphones) { defaults.set(data, forKey: Self.customHeadphonesKey) }
+        onLibraryChanged?()
     }
 
-    private func uniqueName(_ raw: String, existing: [String]) -> String {
+    // MARK: Library (import / export / sync)
+
+    /// Called after local presets/headphones change (the sync service writes the shared file).
+    var onLibraryChanged: (() -> Void)?
+
+    var userLibrary: PresetLibrary {
+        PresetLibrary(presets: customPresets, headphones: customHeadphones,
+                      exportedAt: ISO8601DateFormatter().string(from: Date()))
+    }
+
+    /// Merge items in; returns how many were new.
+    @discardableResult
+    func importLibrary(_ other: PresetLibrary) -> Int {
+        let (merged, added) = userLibrary.merged(with: other)
+        guard added > 0 else { return 0 }
+        customPresets = merged.presets
+        customHeadphones = merged.headphones
+        persistCustomPresets()
+        persistCustomHeadphones()
+        return added
+    }
+
+    func importItem(_ item: ImportedItem) -> String {
+        switch item {
+        case .library(let lib):
+            let n = importLibrary(lib)
+            return n == 0 ? "Nothing new to import." : "Imported \(n) item\(n == 1 ? "" : "s")."
+        case .headphone(let h):
+            saveHeadphone(h)
+            return "Imported headphone profile “\(h.name)”."
+        case .preset(let p):
+            var preset = p
+            preset.name = uniqueName(p.name, existing: musicPresets.map(\.name))
+            customPresets.append(preset)
+            persistCustomPresets()
+            selectMusicPreset(preset)
+            return "Imported preset “\(preset.name)”."
+        }
+    }
+
+    func uniqueName(_ raw: String, existing: [String]) -> String {
         let base = raw.trimmingCharacters(in: .whitespaces).isEmpty ? "Untitled" : raw.trimmingCharacters(in: .whitespaces)
         var name = base, n = 2
         while existing.contains(name) { name = "\(base) \(n)"; n += 1 }
